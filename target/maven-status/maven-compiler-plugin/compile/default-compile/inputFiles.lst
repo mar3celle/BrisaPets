@@ -1,0 +1,6 @@
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/BrisaPetsApplication.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/PetController.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/WebController.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/model/Pet.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/repository/PetRepository.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/service/PetService.java

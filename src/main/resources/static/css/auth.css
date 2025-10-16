@@ -1,0 +1,148 @@
+/*
+    ---------------------------------------------------------
+    Estilos Específicos para a Página de Autenticação (Login/Registro)
+    ---------------------------------------------------------
+*/
+
+.auth-body {
+    background-color: #f7f7f7; /* Fundo cinza bem claro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Cabeçalho (Seta de Volta e Logo)
+*/
+.auth-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.back-link {
+    position: absolute;
+    left: 0;
+    font-size: 1.5em;
+    color: var(--color-text-dark);
+}
+
+.logo-auth {
+    display: flex;
+    align-items: center;
+    font-size: 1.1em;
+    font-weight: 700;
+}
+
+.logo-icon-sm {
+    color: var(--color-primary);
+    margin-right: 5px;
+    font-size: 1.3em;
+}
+
+/* Cartão Principal
+*/
+.auth-card {
+    background-color: var(--color-white);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.auth-title {
+    font-size: 1.8em;
+    color: var(--color-text-dark);
+    margin-bottom: 5px;
+}
+
+.auth-subtitle {
+    color: var(--color-text-light);
+    font-size: 1em;
+    margin-bottom: 30px;
+}
+
+/* Abas de Navegação (Entrar / Criar Conta)
+*/
+.tab-navigation {
+    display: flex;
+    background-color: var(--color-background-light); /* Fundo da barra de abas */
+    border-radius: 10px;
+    margin-bottom: 30px;
+    padding: 5px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: transparent;
+    font-weight: 600;
+    color: var(--color-text-light);
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.tab-btn.active {
+    background-color: var(--color-white);
+    color: var(--color-primary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Sombra para destacar a aba ativa */
+}
+
+
+/* Formulário e Campos
+*/
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+}
+
+.auth-form label {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: -5px;
+}
+
+.input-light-blue {
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background-color: #e6f0ff; /* Cor azul claro sutil do input */
+    color: var(--color-text-dark);
+    font-size: 1em;
+}
+
+.btn-submit {
+    /* Usa a cor rosa principal, mas com um padding maior */
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 15px 25px;
+    margin-top: 15px;
+}
+
+.btn-submit:hover {
+    background-color: #e06e86;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Responsividade */
+@media (max-width: 500px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brisa Pets - Entrar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css"> </head>
+<body class="auth-body">
+
+<div class="login-container">
+
+    <div class="auth-header">
+        <a href="/" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="logo-auth">
+            <i class="fas fa-heart logo-icon-sm"></i>
+            <span>Brisa Pets</span>
+        </div>
+    </div>
+
+    <div class="auth-card">
+        <h2 class="auth-title">Bem-vindo</h2>
+        <p class="auth-subtitle">Entre na sua conta ou crie uma nova para começar</p>
+
+        <div class="tab-navigation">
+            <button class="tab-btn active" id="tab-entrar">Entrar</button>
+            <button class="tab-btn" id="tab-registro">Criar Conta</button>
+        </div>
+
+        <form id="login-form" class="auth-form" action="/login" method="post">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="marcellesart@gmail.com" class="input-light-blue" required>
+
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" name="senha" value="••••••••" class="input-light-blue" required>
+
+            <button type="submit" class="btn btn-submit">Entrar</button>
+        </form>
+
+        <form id="registro-form" class="auth-form hidden" action="/register" method="post">
+            <label for="reg-nome">Nome Completo</label>
+            <input type="text" id="reg-nome" name="nome" class="input-light-blue" required>
+
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" name="email" class="input-light-blue" required>
+
+            <label for="reg-senha">Senha</label>
+            <input type="password" id="reg-senha" name="senha" class="input-light-blue" required>
+
+            <label for="reg-confirma-senha">Confirmar Senha</label>
+            <input type="password" id="reg-confirma-senha" name="confirma-senha" class="input-light-blue" required>
+
+            <button type="submit" class="btn btn-submit">Criar Conta</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const tabEntrar = document.getElementById('tab-entrar');
+    const tabRegistro = document.getElementById('tab-registro');
+    const formLogin = document.getElementById('login-form');
+    const formRegistro = document.getElementById('registro-form');
+
+    tabEntrar.addEventListener('click', () => {
+        tabEntrar.classList.add('active');
+        tabRegistro.classList.remove('active');
+        formLogin.classList.remove('hidden');
+        formRegistro.classList.add('hidden');
+    });
+
+    tabRegistro.addEventListener('click', () => {
+        tabRegistro.classList.add('active');
+        tabEntrar.classList.remove('active');
+        formRegistro.classList.remove('hidden');
+        formLogin.classList.add('hidden');
+    });
+</script>
+</body>
+</html>

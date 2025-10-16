@@ -1,0 +1,474 @@
+/*
+    ---------------------------------------------------------
+    Variáveis e Reset Básico
+    ---------------------------------------------------------
+*/
+:root {
+    --color-primary: #fe87a0; /* Rosa Principal / Botão Entrar */
+    --color-secondary: #ffb1c3; /* Rosa mais claro / Círculos de Ícone */
+    --color-text-dark: #333;
+    --color-text-light: #555;
+    --color-background-light: #f9f9f9;
+    --color-white: #fff;
+    --color-hero-tag: #c9937a; /* Marrom-claro no tag premium */
+    --color-get-in-touch: #ffdd55; /* Amarelo no círculo flutuante */
+    --font-family-main: 'Inter', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family-main);
+    color: var(--color-text-dark);
+    line-height: 1.6;
+    background-color: var(--color-white);
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-text-light);
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: var(--color-primary);
+}
+
+h1, h2, h3 {
+    font-weight: 700;
+    margin-bottom: 0.5em;
+}
+
+/*
+    ---------------------------------------------------------
+    Estilos Gerais de Seção e Títulos
+    ---------------------------------------------------------
+*/
+.section-padded {
+    padding: 80px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.section-tag-small {
+    display: inline-block;
+    padding: 5px 15px;
+    background-color: var(--color-secondary);
+    color: var(--color-text-dark);
+    font-size: 0.85em;
+    font-weight: 600;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.section-title {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+}
+
+.section-subtitle, .section-description-lg {
+    color: var(--color-text-light);
+    font-size: 1.1em;
+    max-width: 800px;
+    margin: 0 auto 40px auto;
+}
+
+
+/*
+    ---------------------------------------------------------
+    Estilos de Botões (Btns)
+    ---------------------------------------------------------
+*/
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, opacity 0.3s;
+    font-size: 1em;
+}
+
+.btn-primary { /* Botão "Entrar" */
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.btn-primary:hover {
+    background-color: #e06e86;
+}
+
+.btn-secondary { /* Botão "Vou viajar" */
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 15px 35px;
+    opacity: 0.9;
+}
+
+.btn-secondary:hover {
+    opacity: 1;
+}
+
+.btn-light-bg { /* Botão "Agendar Serviço" */
+    background-color: var(--color-white);
+    color: var(--color-text-dark);
+    border: 1px solid var(--color-text-light);
+    padding: 15px 35px;
+    opacity: 0.9;
+}
+
+.btn-light-bg:hover {
+    opacity: 1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+/*
+    ---------------------------------------------------------
+    1. HEADER
+    ---------------------------------------------------------
+*/
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    border-bottom: 1px solid #eee;
+    background-color: var(--color-white);
+    position: fixed; /* Fixa o header no topo */
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.logo-icon {
+    color: var(--color-primary);
+    margin-right: 5px;
+}
+
+.logo-name {
+    margin-right: 10px;
+}
+
+.logo-slogan {
+    font-size: 0.7em;
+    font-weight: 400;
+    color: var(--color-text-light);
+    opacity: 0.7;
+}
+
+.nav-menu a {
+    margin-left: 25px;
+}
+
+
+/*
+    ---------------------------------------------------------
+    2. HERO SECTION
+    ---------------------------------------------------------
+*/
+.hero-section {
+    position: relative;
+    height: 100vh; /* Ocupa a altura total da viewport */
+    /* ATENÇÃO: Se a imagem estiver em `static/images/hero.jpg`, o caminho será: */
+    background-image: url('/images/hero.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px; /* Espaço para o header fixo */
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.3); /* Overlay branco/opaco */
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    color: var(--color-text-dark);
+    text-align: center;
+    max-width: 900px;
+}
+
+.tag-premium {
+    display: inline-block;
+    background-color: var(--color-white);
+    color: var(--color-hero-tag);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.hero-content h1 {
+    font-size: 5em;
+    color: var(--color-primary);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.hero-content h2 {
+    font-size: 2em;
+    font-weight: 400;
+    margin-bottom: 20px;
+}
+
+.hero-content p {
+    font-size: 1.1em;
+    color: var(--color-text-dark);
+    margin-bottom: 40px;
+}
+
+.hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Círculo "Get in Touch" */
+.get-in-touch-circle {
+    position: absolute;
+    top: 15%;
+    left: 5%;
+    width: 150px;
+    height: 150px;
+    background: var(--color-get-in-touch);
+    color: var(--color-primary);
+    border-radius: 50%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: 900;
+    line-height: 1.1;
+    transform: rotate(-10deg);
+    box-shadow: 0 0 0 10px rgba(255, 221, 85, 0.5); /* Efeito de borda */
+}
+
+
+/*
+    ---------------------------------------------------------
+    3. SEÇÃO SERVIÇOS
+    ---------------------------------------------------------
+*/
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    text-align: left;
+}
+
+.service-card {
+    background-color: var(--color-white);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.service-card h3 {
+    font-size: 1.3em;
+    color: var(--color-text-dark);
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    background-color: var(--color-secondary);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    color: var(--color-primary);
+    margin-bottom: 15px;
+    opacity: 0.8;
+}
+
+.list-bulleted {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 15px;
+}
+
+.list-bulleted li {
+    font-size: 0.95em;
+    color: var(--color-text-light);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.list-bullet {
+    font-size: 0.4em;
+    color: var(--color-primary);
+    margin-right: 10px;
+}
+
+
+/*
+    ---------------------------------------------------------
+    4. SEÇÃO QUEM SOMOS
+    ---------------------------------------------------------
+*/
+.section-quemsomos {
+    background-color: var(--color-background-light); /* Fundo sutil para esta seção */
+}
+
+.mission-vision-grid {
+    display: flex;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.card-large {
+    flex: 1;
+    background-color: var(--color-white);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    text-align: left;
+}
+
+.card-large h3 {
+    color: var(--color-primary);
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+.card-large p {
+    color: var(--color-text-light);
+}
+
+
+/*
+    ---------------------------------------------------------
+    5. SEÇÃO CARACTERÍSTICAS/VALORES
+    ---------------------------------------------------------
+*/
+.section-features {
+    background-color: var(--color-white);
+    padding-top: 40px;
+    padding-bottom: 80px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.feature-card {
+    text-align: center;
+    padding: 20px;
+}
+
+.feature-card h3 {
+    font-size: 1.2em;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.feature-card p {
+    color: var(--color-text-light);
+}
+
+.icon-circle.pink-bg {
+    margin: 0 auto 15px auto;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-secondary);
+}
+
+
+/*
+    ---------------------------------------------------------
+    6. FOOTER
+    ---------------------------------------------------------
+*/
+.footer {
+    text-align: center;
+    padding: 20px 5%;
+    background-color: var(--color-background-light);
+    border-top: 1px solid #eee;
+    color: var(--color-text-light);
+    font-size: 0.9em;
+}
+
+/*
+    ---------------------------------------------------------
+    MEDIA QUERIES (Responsividade básica para celular)
+    ---------------------------------------------------------
+*/
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        padding: 10px 5%;
+        position: static;
+    }
+    .nav-menu {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+    .nav-menu a {
+        margin-left: 0;
+    }
+    .hero-section {
+        height: auto;
+        padding: 120px 5% 80px 5%;
+    }
+    .hero-content h1 {
+        font-size: 3em;
+    }
+    .hero-content h2 {
+        font-size: 1.5em;
+    }
+    .hero-actions {
+        flex-direction: column;
+    }
+    .get-in-touch-circle {
+        display: none; /* Esconde o elemento flutuante no celular */
+    }
+    .mission-vision-grid {
+        flex-direction: column;
+    }
+    .section-title {
+        font-size: 2em;
+    }
+}

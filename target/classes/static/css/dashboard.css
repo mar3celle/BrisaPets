@@ -1,0 +1,543 @@
+/*
+    ---------------------------------------------------------
+    Estilos Específicos para Páginas de Dashboard (Pets, Agendamento)
+    ---------------------------------------------------------
+*/
+
+/* Menu de Navegação Interno */
+.nav-menu-internal {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.nav-link-icon {
+    display: flex;
+    align-items: center;
+    color: var(--color-text-light);
+    font-size: 0.9em;
+    font-weight: 500;
+    padding: 5px 0;
+    position: relative;
+}
+
+.nav-link-icon i {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.nav-link-icon.active {
+    color: var(--color-primary);
+}
+
+.nav-link-icon.active::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: var(--color-primary);
+    border-radius: 2px;
+}
+
+.nav-link-icon.sair {
+    color: var(--color-text-light);
+    border: 1px solid #eee;
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+
+/* Tag de Seção Interna */
+.internal-tag {
+    background-color: var(--color-secondary);
+    opacity: 0.5;
+}
+
+/* GRID DE PETS */
+.pets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    text-align: center;
+    margin-top: 40px;
+}
+
+.pet-card {
+    background-color: var(--color-white);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.pet-photo-container {
+    width: 120px;
+    height: 120px;
+    background-color: #fce8f0; /* Rosa claro para fundo da foto */
+    border-radius: 50%;
+    margin: 0 auto 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+    position: relative;
+}
+
+.pet-emoji {
+    font-size: 4em;
+    transform: translateY(-5px); /* Ajusta a posição vertical do emoji */
+}
+
+.camera-icon {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: var(--color-white);
+    border-radius: 50%;
+    padding: 5px;
+    font-size: 0.7em;
+    color: var(--color-primary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.pet-name {
+    font-size: 1.5em;
+    color: var(--color-text-dark);
+    margin-bottom: 25px;
+}
+
+.pet-details-box {
+    text-align: left;
+    max-width: 250px;
+    margin: 0 auto;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95em;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    color: var(--color-text-light);
+}
+
+.bold-value {
+    font-weight: 600;
+}
+
+/* Cartão para Adicionar Novo Pet */
+.add-new-pet {
+    border: 2px dashed #ffe5ed; /* Borda tracejada rosa clara */
+    transition: all 0.3s;
+}
+
+.add-new-pet:hover {
+    background-color: #fffafa;
+    transform: none; /* Remove a translação de hover do card padrão */
+}
+
+.add-icon-container {
+    background-color: transparent;
+    border: 2px solid var(--color-secondary);
+    color: var(--color-primary);
+    font-size: 2em;
+}
+
+.add-new-pet p {
+    color: var(--color-text-light);
+    margin-bottom: 25px;
+}
+
+.btn-add-pet {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    padding: 10px 30px;
+    font-weight: 700;
+    border-radius: 25px;
+}
+
+/*
+    ---------------------------------------------------------
+    Estilos de Agendamento
+    ---------------------------------------------------------
+*/
+
+.appointment-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr; /* Coluna de serviços maior que a de agendamento */
+    gap: 40px;
+    text-align: left;
+    margin-top: 40px;
+}
+
+.subsection-title {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin-bottom: 25px;
+}
+
+/* Lista de Serviços (Esquerda) */
+.service-option {
+    display: flex;
+    gap: 20px;
+    background-color: var(--color-white);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid transparent;
+}
+
+.service-option.selected {
+    background-color: #fff0f5; /* Fundo rosa claro para o item selecionado */
+    border-color: var(--color-primary);
+}
+
+.service-icon-circle {
+    min-width: 50px;
+    height: 50px;
+    background-color: var(--color-secondary);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    color: var(--color-primary);
+}
+
+.service-icon-circle.selected-bg {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.service-details h4 {
+    font-size: 1.1em;
+    margin: 0;
+    font-weight: 600;
+}
+
+.service-details p {
+    font-size: 0.9em;
+    color: var(--color-text-light);
+    margin: 5px 0 10px 0;
+}
+
+.service-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    color: var(--color-text-light);
+}
+
+.service-meta i {
+    margin-right: 5px;
+}
+
+.price-tag {
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.popular-tag {
+    display: inline-block;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    font-size: 0.7em;
+    padding: 3px 8px;
+    border-radius: 10px;
+    margin-left: 10px;
+    font-weight: 600;
+}
+
+/* Agenda e Calendário (Direita) */
+.date-time-box {
+    background-color: var(--color-white);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.box-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 25px;
+}
+
+.box-title i {
+    margin-right: 10px;
+}
+
+/* Calendário */
+.calendar-header {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center;
+}
+
+.day-name {
+    font-size: 0.8em;
+    color: var(--color-text-light);
+    font-weight: 500;
+    padding: 5px 0;
+}
+
+.day-number {
+    padding: 10px 0;
+    border-radius: 50%;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.day-number.inactive {
+    color: #ccc;
+    cursor: default;
+}
+
+.day-number:hover:not(.inactive) {
+    background-color: #f0f0f0;
+}
+
+.day-number.selected-day {
+    background-color: var(--color-secondary);
+    color: var(--color-text-dark);
+}
+
+/* Horários */
+.horarios-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.time-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.time-slot {
+    padding: 8px 15px;
+    border: 1px solid #eee;
+    background-color: #fff;
+    border-radius: 20px;
+    cursor: not-allowed;
+    color: #ccc;
+    font-weight: 500;
+}
+
+.time-slot.active-time {
+    border-color: var(--color-secondary);
+    color: var(--color-text-dark);
+    cursor: pointer;
+}
+
+.time-slot.selected-time {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+.btn-confirm-appointment {
+    width: 100%;
+    background-color: #ffdd55; /* Amarelo da imagem */
+    color: var(--color-text-dark);
+    font-weight: 700;
+    margin-top: 30px;
+}
+
+/* Responsividade Agendamento */
+@media (max-width: 992px) {
+    .appointment-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/*
+    ---------------------------------------------------------
+    Estilos da Galeria Privada
+    ---------------------------------------------------------
+*/
+
+.gallery-tag {
+    background-color: #ffdd55; /* Amarelo para destacar */
+}
+
+.exclusive-access-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff0f5; /* Fundo rosa claro */
+    padding: 25px;
+    border-radius: 15px;
+    max-width: 900px;
+    margin: 40px auto;
+    text-align: left;
+}
+
+.access-icon-text {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.access-icon-text i {
+    font-size: 1.5em;
+    color: var(--color-primary);
+}
+
+.access-icon-text h4 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.access-icon-text p {
+    margin: 0;
+    font-size: 0.9em;
+    color: var(--color-text-light);
+}
+
+.pet-in-hospedagem-tag {
+    background-color: var(--color-secondary);
+    color: var(--color-text-dark);
+    font-size: 0.8em;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-weight: 600;
+}
+
+.photos-title {
+    font-size: 1.5em;
+    text-align: left;
+    max-width: 1200px;
+    margin: 40px auto 20px auto;
+}
+
+.gallery-actions {
+    text-align: right;
+    max-width: 1200px;
+    margin: 0 auto 30px auto;
+}
+
+.gallery-btn {
+    background-color: transparent;
+    border: none;
+    color: var(--color-text-dark);
+    font-weight: 500;
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+.gallery-btn i {
+    color: var(--color-primary);
+    margin-right: 5px;
+}
+
+.photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.photo-card {
+    background-color: var(--color-white);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    text-align: left;
+}
+
+.photo-placeholder {
+    height: 300px; /* Altura fixa para a área da imagem */
+    background-color: #fcfcfc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pet-emoji-lg {
+    font-size: 6em;
+}
+
+.photo-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 15px 15px 10px 15px;
+}
+
+.photo-info {
+    flex-grow: 1;
+}
+
+.photo-pet-name {
+    font-weight: 700;
+    font-size: 1.1em;
+    color: var(--color-text-dark);
+    display: block;
+}
+
+.photo-description {
+    font-size: 0.9em;
+    color: var(--color-text-light);
+    margin-top: 2px;
+}
+
+.photo-time-tag {
+    background-color: var(--color-secondary);
+    color: var(--color-text-dark);
+    font-size: 0.75em;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: 600;
+}
+
+.photo-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 15px 15px 15px;
+    border-top: 1px solid #eee;
+    margin-top: 5px;
+}
+
+.action-icon {
+    flex: 1;
+    text-align: center;
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    padding: 10px 0;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.action-icon i {
+    margin-right: 5px;
+}

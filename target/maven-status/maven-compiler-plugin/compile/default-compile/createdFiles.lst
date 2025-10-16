@@ -1,0 +1,6 @@
+com/brisapets/webapp/service/PetService.class
+com/brisapets/webapp/BrisaPetsApplication.class
+com/brisapets/webapp/controller/PetController.class
+com/brisapets/webapp/model/Pet.class
+com/brisapets/webapp/controller/WebController.class
+com/brisapets/webapp/repository/PetRepository.class
