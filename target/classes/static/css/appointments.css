@@ -1,0 +1,52 @@
+
+/* Estilos básicos para a tabela de agendamentos */
+.appointment-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    background-color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.appointment-table th, .appointment-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+.appointment-table th {
+    background-color: #fce4ec; /* Cor de fundo suave (rosa claro) */
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+.appointment-table tr:last-child td {
+    border-bottom: none;
+}
+.appointment-table tr:hover {
+    background-color: #fffafc;
+}
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block; /* Garante que o padding funcione corretamente */
+}
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+.status-confirmed {
+    background-color: #d4edda;
+    color: #155724;
+}
+.no-appointments {
+    text-align: center;
+    padding: 40px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    margin-top: 30px;
+    color: #777;
+}

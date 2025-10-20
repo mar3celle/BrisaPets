@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brisa Pets - Meus Companheiros</title>
+    <title>Brisa Pets - Meus Pets</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/dashboard.css"> </head>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/pets.css">
+</head>
 <body>
 
 <header class="header">
@@ -17,8 +19,9 @@
         <span class="logo-slogan">Cuidados com amor</span>
     </div>
     <nav class="nav-menu-internal">
-        <a href="#" class="nav-link-icon active"><i class="fas fa-paw"></i> Meus Pets</a>
+        <a href="/pets" class="nav-link-icon active"><i class="fas fa-paw"></i> Meus Pets</a>
         <a href="/agendar" class="nav-link-icon"><i class="fas fa-calendar-alt"></i> Agendar Serviço</a>
+        <a href="/appointments" class="nav-link-icon"><i class="fas fa-list-alt"></i> Meus Agendamentos</a>
         <a href="/hospedagem" class="nav-link-icon"><i class="fas fa-bed"></i> Hospedagem</a>
         <a href="/perfil" class="nav-link-icon"><i class="fas fa-user-circle"></i> Perfil</a>
         <a href="/logout" class="nav-link-icon sair"><i class="fas fa-sign-out-alt"></i> Sair</a>
@@ -26,111 +29,76 @@
 </header>
 
 <section class="section-padded">
-    <div class="section-tag-small internal-tag">Meus Companheiros</div>
-    <h2 class="section-title">Os Seus Pets</h2>
+    <div class="section-tag-small internal-tag">Gestão</div>
+    <h2 class="section-title">Meus Amigos</h2>
     <p class="section-subtitle">
-        Gerencie as informações dos seus companheiros de quatro patas. Mantenha
-        todos os dados importantes organizados e acessíveis.
+        Aqui estão todos os seus pets registados. Adicione, edite ou agende um serviço para eles!
     </p>
 
+    <div th:if="${message}" class="alert alert-success" style="margin-bottom: 20px; padding: 15px; background-color: #d4edda; color: #155724; border-radius: 8px;" th:text="${message}">Pet salvo com sucesso!</div>
+    <div th:if="${error}" class="alert alert-danger" style="margin-bottom: 20px; padding: 15px; background-color: #f8d7da; color: #721c24; border-radius: 8px;" th:text="${error}">Erro ao deletar o Pet.</div>
+
+    <div class="add-pet-container">
+        <h3><i class="fas fa-plus-circle"></i> Adicionar Novo Pet</h3>
+
+        <form th:action="@{/pets/save}" th:object="${pet}" method="post" class="add-pet-form">
+            <div class="form-group">
+                <label for="nome">Nome do Pet</label>
+                <input type="text" id="nome" th:field="*{nome}" placeholder="Nome do Pet" required />
+            </div>
+            <div class="form-group">
+                <label for="raca">Raça (Ex: Caniche)</label>
+                <input type="text" id="raca" th:field="*{raca}" placeholder="Raça (Ex: Caniche)" required />
+            </div>
+            <div class="form-group">
+                <label for="idade">Idade (em anos)</label>
+                <input type="number" id="idade" th:field="*{idade}" placeholder="0" required min="0" />
+            </div>
+            <div class="form-group">
+                <label for="imageUrl">URL da Imagem (Opcional)</label>
+                <input type="text" id="imageUrl" th:field="*{imageUrl}" placeholder="Link para imagem do Pet" />
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="castrado" th:field="*{castrado}" />
+                <label for="castrado">É castrado?</label>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Salvar Pet</button>
+        </form>
+    </div>
+
+    <div th:if="${pets.isEmpty()}" class="no-pets">
+        <i class="fas fa-box-open fa-3x mb-3"></i>
+        <p>Ainda não há pets registados. Use o formulário acima para adicionar o seu primeiro amigo!</p>
+    </div>
+
     <div class="pets-grid">
-        <div class="pet-card">
-            <div class="pet-photo-container">
-                <div class="camera-icon"><i class="fas fa-camera"></i></div>
-                <span class="pet-emoji">🐶</span>
+        <div th:each="pet : ${pets}" class="pet-card">
+
+            <div class="pet-image-container">
+                <img th:if="${pet.imageUrl}" th:src="${pet.imageUrl}" alt="Foto do Pet" class="pet-image"/>
+                <span th:unless="${pet.imageUrl}" class="pet-emoji">🐶</span>
             </div>
-            <h3 class="pet-name">Pudim</h3>
-            <div class="pet-details-box">
-                <div class="detail-row">
-                    <label>Cão</label>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Idade:</span>
-                    <span class="detail-value bold-value">4 anos</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Castrado:</span>
-                    <span class="detail-value">Sim</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Raça:</span>
-                    <span class="detail-value bold-value">Caniche</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Alimentação:</span>
-                    <span class="detail-value">...</span>
-                </div>
+
+            <div class="pet-details">
+                <h3 th:text="${pet.nome}">Nome do Pet</h3>
+                <p>Raça: <span th:text="${pet.raca}">Raça</span></p>
+                <p>Idade: <span th:text="${pet.idade}">0</span> anos</p>
+                <p th:if="${pet.castrado}">Status: <span style="color: #d81b60; font-weight: 600;">Castrado</span></p>
             </div>
-        </div>
 
-        <div class="pets-grid">
-            <div class="pet-card add-new-pet form-wrapper">
-                <form th:action="@{/pets/save}" th:object="${pet}" method="post">
-                    <div class="pet-photo-container add-icon-container">
-                        <i class="fas fa-plus add-icon"></i>
-                    </div>
+            <div class="pet-actions">
+                <a th:href="@{/agendar}" class="btn btn-secondary btn-sm"><i class="fas fa-calendar-alt"></i> Agendar</a>
 
-                    <input type="hidden" th:field="*{id}" />
-
-                    <h3 class="pet-name">Adicionar Novo Pet</h3>
-
-                    <div class="pet-details-box">
-
-                        <div class="detail-row">
-                            <input type="text" th:field="*{nome}" placeholder="Nome do Pet" class="form-control" required>
-                        </div>
-
-                        <div class="detail-row">
-                            <input type="text" th:field="*{raca}" placeholder="Raça (Ex: Caniche)" class="form-control" required>
-                        </div>
-
-                        <div class="detail-row">
-                            <input type="number" th:field="*{idade}" placeholder="Idade (Anos)" class="form-control" min="0" required>
-                        </div>
-
-                        <div class="detail-row form-check-inline">
-                            <input type="checkbox" th:field="*{castrado}" id="castrado-check" class="form-check-input">
-                            <label class="form-check-label" for="castrado-check">É castrado?</label>
-                        </div>
-
-                    </div>
-
-                    <button type="submit" class="btn btn-add-pet primary-action-btn">
-                        <i class="fas fa-plus"></i> Salvar Pet
+                <form th:action="@{/pets/delete/{id}(id=${pet.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn-delete" onclick="return confirm('Tem certeza que deseja deletar este Pet? Esta ação não pode ser desfeita.');">
+                        <i class="fas fa-trash"></i> Deletar
                     </button>
                 </form>
             </div>
 
-            <div class="pet-card" th:each="p : ${pets}">
-                <div class="pet-photo-container">
-                    <div class="camera-icon"><i class="fas fa-camera"></i></div>
-                    <span class="pet-emoji">🐾</span> </div>
-                <h3 class="pet-name" th:text="${p.nome}">Pudim</h3>
-                <div class="pet-details-box">
-                    <div class="detail-row">
-                        <span class="detail-label">ID:</span>
-                        <span class="detail-value" th:text="${p.id}">1</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Raça:</span>
-                        <span class="detail-value bold-value" th:text="${p.raca}">Caniche</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Idade:</span>
-                        <span class="detail-value bold-value" th:text="${p.idade} + ' anos'">4 anos</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Castrado:</span>
-                        <span class="detail-value" th:text="${p.castrado} ? 'Sim' : 'Não'">Sim</span>
-                    </div>
-                </div>
-                <div class="pet-actions">
-                    <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-edit"></i> Editar</a>
-                    <a href="#" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Deletar</a>
-                </div>
-            </div>
         </div>
- </section>
+    </div>
+</section>
 
 </body>
 </html>

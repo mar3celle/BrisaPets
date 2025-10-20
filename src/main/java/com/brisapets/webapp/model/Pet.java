@@ -1,25 +1,29 @@
 package com.brisapets.webapp.model;
 
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.ArrayList;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data // Gera Getters, Setters, toString, equals e hashCode (Lombok)
-@Entity // Define esta classe como uma entidade JPA (tabela no banco)
-@Table(name = "pets") // Nome da tabela no PostgreSQL
+@Data
+@NoArgsConstructor
+@Entity
+@Table(name = "pets")
 public class Pet {
 
-    @Id // Define a chave primária
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremento
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Dados que aparecem na página 'Meus Pets'
-    private String type; // Ex: cão ou gato
-    private String nome; // Ex: Pudim
-    private String raca; // Ex: Caniche
-    private int idade;   // Ex: 4
-    private boolean castrado; // Ex: Sim/Não
-    private long tutorId;
+    private String nome;
+    private String raca;
+    private Integer idade;
+    private Boolean castrado;
+    private String imageUrl;
+    private Long tutorId;
 
-
-
+    // Inicializa a lista para evitar NPE (NullPointerException)
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Appointment> appointments = new ArrayList<>(); // Inicialização!
 }

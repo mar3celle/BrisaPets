@@ -27,11 +27,7 @@ public class WebController {
         return "pets";
     } */
 
-    // Rota para a página de Agendamento. (booking.html)
-    @GetMapping("/agendar")
-    public String schedule() {
-        return "booking";
-    }
+
 
     // Rota para a página de Hospedagem/Galeria. (gallery.html)
     @GetMapping("/hospedagem")

@@ -1,0 +1,86 @@
+/* Estilos para feedback visual e funcionalidade na página de agendamento */
+
+/* design responsivo */
+.appointment-grid {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+    flex-wrap: wrap; /* Permite quebrar em telas menores */
+}
+
+.services-list-container {
+    flex: 1;
+    min-width: 300px; /* Garante que não fique muito estreito */
+}
+
+.schedule-container {
+    flex: 2;
+    min-width: 400px;
+}
+
+/* Estilos para seleção de Serviço, Dia e Hora */
+.service-option.is-selected {
+    border: 2px solid #ff7b9c; /* Cor do Brisa Pets (Rosa) */
+    box-shadow: 0 0 10px rgba(255, 123, 156, 0.5);
+}
+
+.day-number {
+    /* Estilos base para os dias do calendário  */
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.day-number.is-selected {
+    background-color: #ff7b9c;
+    color: white;
+    font-weight: bold;
+}
+
+.time-slot {
+    /* Estilos base para os horários */
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    transition: background-color 0.2s;
+}
+
+.time-slot:hover {
+    background-color: #f7f7f7;
+}
+
+.time-slot.is-selected {
+    background-color: #ff7b9c;
+    color: white;
+    font-weight: bold;
+    border-color: #ff7b9c;
+}
+
+.btn-confirm-appointment:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Estilos de navegação de calendário */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.calendar-header .month-year {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.calendar-header .nav-button {
+    background: none;
+    border: none;
+    color: #ff7b9c;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px;
+}

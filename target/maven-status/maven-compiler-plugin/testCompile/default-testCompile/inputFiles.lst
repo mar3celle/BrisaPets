@@ -1,1 +1,4 @@
 /home/user/WorkSpace/BrisaPetsWebApp/src/test/java/com/brisapets/webapp/BrisaPetsApplicationTests.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/test/java/com/brisapets/webapp/controller/AppointmentControllerTest.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/test/java/com/brisapets/webapp/service/AppointmentServiceTest.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/test/java/com/brisapets/webapp/service/PetServiceTest.java
