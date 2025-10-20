@@ -21,11 +21,11 @@ public class WebController {
         return "login";
     }
 
-    // Mapeia a URL /pets para o template 'pets.html'
+    /* Mapeia a URL /pets para o template 'pets.html'
     @GetMapping("/pets")
     public String myPets() {
         return "pets";
-    }
+    } */
 
     // Rota para a página de Agendamento. (booking.html)
     @GetMapping("/agendar")

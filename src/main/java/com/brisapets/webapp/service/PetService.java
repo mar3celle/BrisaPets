@@ -14,28 +14,32 @@ public class PetService {
     private final PetRepository petRepository;
 
     @Autowired
-    // Injeção de dependência do PetRepository
     public PetService(PetRepository petRepository) {
         this.petRepository = petRepository;
     }
 
-    // Salvar ou atualizar um Pet
-    public Pet save(Pet pet) {
+    // 1. Método para salvar ou atualizar um Pet
+    public Pet savePet(Pet pet) {
         return petRepository.save(pet);
     }
 
-    // Encontrar Pet por ID
-    public Optional<Pet> findById(Long id) {
-        return petRepository.findById(id);
-    }
-
-    // Listar todos os Pets
-    public List<Pet> findAll() {
+    // 2. Método para buscar todos os Pets
+    public List<Pet> findAllPets() {
         return petRepository.findAll();
     }
 
-    // Deletar Pet por ID
-    public void deleteById(Long id) {
+    // 3. Método para buscar um Pet pelo ID
+    public Optional<Pet> findPetById(Long id) {
+        return petRepository.findById(id);
+    }
+
+    // 4. Método para deletar um Pet pelo ID
+    public void deletePet(Long id) {
         petRepository.deleteById(id);
+    }
+
+    public List<Pet> findPetsByTutor(Long tutorId) {
+        // return petRepository.findByTutorId(tutorId);
+        return petRepository.findAll();
     }
 }
