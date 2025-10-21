@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-PT" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brisa Pets - Meu Perfil</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="logo-container">
+        <i class="fas fa-heart logo-icon"></i>
+        <span class="logo-name">Brisa Pets</span>
+        <span class="logo-slogan">Cuidados com amor</span>
+    </div>
+    <nav class="nav-menu-internal">
+        <a href="/pets" class="nav-link-icon"><i class="fas fa-paw"></i> Meus Pets</a>
+        <a href="/agendar" class="nav-link-icon"><i class="fas fa-calendar-alt"></i> Agendar Serviço</a>
+        <a href="/appointments" class="nav-link-icon"><i class="fas fa-list-alt"></i> Meus Agendamentos</a>
+        <a href="/hospedagem" class="nav-link-icon"><i class="fas fa-bed"></i> Hospedagem</a>
+        <a href="/perfil" class="nav-link-icon active"><i class="fas fa-user-circle"></i> Perfil</a>
+        <a href="/logout" class="nav-link-icon sair"><i class="fas fa-sign-out-alt"></i> Sair</a>
+    </nav>
+</header>
+
+<section class="section-padded">
+    <div class="section-tag-small internal-tag">Configurações</div>
+    <h2 class="section-title">Bem-vindo(a), <span th:text="${userName}">Nome do Tutor</span></h2>
+    <p class="section-subtitle">
+        Gerencie as suas informações de contacto e credenciais.
+    </p>
+
+    <div class="profile-container">
+        <div class="profile-card">
+            <h3><i class="fas fa-user-circle"></i> Informações de Conta</h3>
+            <p><strong>Nome:</strong> <span th:text="${userFullName}">Nome Completo</span></p>
+            <p><strong>Email:</strong> <span th:text="${userEmail}">email@exemplo.com</span></p>
+            <p><strong>Telefone:</strong> <span th:text="${userPhone}">+351 9XX XXX XXX</span></p>
+
+            <button class="btn btn-primary btn-sm" style="margin-top: 15px;"><i class="fas fa-edit"></i> Editar Informações</button>
+        </div>
+
+        <div class="profile-card">
+            <h3><i class="fas fa-lock"></i> Segurança</h3>
+            <p><strong>Senha:</strong> *********</p>
+            <p><strong>Tipo de Conta:</strong> <span th:text="${userRole}">Cliente</span></p>
+
+            <button class="btn btn-secondary btn-sm" style="margin-top: 15px;"><i class="fas fa-key"></i> Alterar Senha</button>
+        </div>
+
+        <div class="profile-card">
+            <h3><i class="fas fa-map-marker-alt"></i> Morada</h3>
+            <p th:text="${userAddressLine1}">Rua Exemplo, 123</p>
+            <p th:text="${userAddressLine2}">Código Postal, Cidade</p>
+            <button class="btn btn-secondary btn-sm" style="margin-top: 15px;"><i class="fas fa-edit"></i> Editar Morada</button>
+        </div>
+
+    </div>
+</section>
+
+<style>
+    .profile-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+    .profile-card {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    .profile-card h3 {
+        color: #d81b60;
+        margin-bottom: 20px;
+    }
+    .profile-card p {
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+    .profile-card strong {
+        color: #333;
+    }
+</style>
+
+</body>
+</html>

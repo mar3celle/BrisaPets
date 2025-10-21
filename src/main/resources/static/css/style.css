@@ -472,3 +472,120 @@ h1, h2, h3 {
         font-size: 2em;
     }
 }
+
+/* --- Estilos para a Seção de Contactos no index.html --- */
+
+.section-contactos {
+    background-color: #f7f7f7;
+}
+
+.contact-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.contact-card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.contact-card h3 {
+    font-size: 1.4rem;
+    color: #4a4a4a;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.contact-card h3 i {
+    margin-right: 10px;
+    color: #d81b60; /* Cor principal */
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.contact-icon {
+    font-size: 1.5rem;
+    margin-right: 15px;
+}
+
+.contact-item a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.contact-item a:hover {
+    color: #d81b60;
+}
+
+/* Cores específicas para ícones */
+.green-icon { color: #25d366; } /* WhatsApp */
+.pink-icon { color: #c13584; } /* Instagram */
+.purple-icon { color: #8e44ad; } /* Email */
+
+/* Estilos para Horário */
+.schedule-list {
+    list-style: none;
+    padding: 0;
+}
+
+.schedule-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.schedule-list li:last-of-type {
+    border-bottom: none;
+}
+
+.schedule-day {
+    font-weight: 600;
+    color: #333;
+}
+
+.schedule-time {
+    color: #d81b60;
+    font-weight: 700;
+}
+
+.schedule-note {
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 10px;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Estilos para Localização */
+.location-card p {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.btn-mapa {
+    display: inline-block;
+    background-color: #6a1b9a; /* Roxo para destacar */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    margin-top: 15px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.btn-mapa:hover {
+    background-color: #4a148c;
+}

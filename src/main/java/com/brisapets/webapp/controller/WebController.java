@@ -1,11 +1,10 @@
 package com.brisapets.webapp.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model; // Necessário para passar dados ao template
 import org.springframework.web.bind.annotation.GetMapping;
 
-/**
- * Controller responsável por mapear as URLs para as páginas HTML (views/templates).
- */
+
 @Controller
 public class WebController {
 
@@ -21,14 +20,6 @@ public class WebController {
         return "login";
     }
 
-    /* Mapeia a URL /pets para o template 'pets.html'
-    @GetMapping("/pets")
-    public String myPets() {
-        return "pets";
-    } */
-
-
-
     // Rota para a página de Hospedagem/Galeria. (gallery.html)
     @GetMapping("/hospedagem")
     public String gallery() {
@@ -37,9 +28,18 @@ public class WebController {
 
     // Rota opcional para o perfil
     @GetMapping("/perfil")
-    public String profile() {
-        // Redireciona temporariamente, até a criação da página 'perfil.html'
-        return "redirect:/";
+    public String profile(Model model) { // Adicione 'Model model' como argumento
+
+        // --- Dados Mockup Temporários (Serão substituídos pelo Spring Security) ---
+        model.addAttribute("userName", "Mestre Tutor");
+        model.addAttribute("userFullName", "Brisa Pets - Sede");
+        model.addAttribute("userEmail", "geral@brisapets.pt");
+        model.addAttribute("userPhone", "+351 910 000 000");
+        model.addAttribute("userRole", "CLIENTE");
+        model.addAttribute("userAddressLine1", "Rua do Comércio, 10");
+        model.addAttribute("userAddressLine2", "1200-000 Lisboa");
+
+        return "profile";
     }
 
     // Rota opcional para Sair/Logout
