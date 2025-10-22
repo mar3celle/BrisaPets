@@ -1,16 +1,24 @@
 package com.brisapets.webapp.controller;
 
-import com.brisapets.webapp.dto.UserRegistrationDto; // Import CRÍTICO para o formulário de registo
+import com.brisapets.webapp.dto.UserRegistrationDto;
+import com.brisapets.webapp.model.User;
+import com.brisapets.webapp.service.UserService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model; // Import CRÍTICO para passar dados ao template
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 
-/**
- * Controller responsável por mapear as URLs públicas para as páginas HTML.
- */
 @Controller
 public class WebController {
+
+    private final UserService userService;
+
+    // CONSTRUTOR COM INJEÇÃO DE DEPENDÊNCIA
+    public WebController(UserService userService) {
+        this.userService = userService;
+    }
 
     // Mapeia a URL base (/) para o template 'index.html'
     @GetMapping("/")
@@ -18,21 +26,15 @@ public class WebController {
         return "index";
     }
 
-    /**
-     * Mapeia as URLs de login para o template 'login.html'.
-     * CRÍTICO: Garante que o objeto 'user' (DTO) está no Model para o Thymeleaf.
-     */
     @GetMapping({"/entrar", "/login", "/autenticar"})
     public String loginPage(Model model) {
-
-        // Se o Model não contiver o objeto 'user' (DTO para o formulário de Registo), adicione-o.
+        // Garante que o objeto 'user' (DTO) está no Model para o Thymeleaf do Registo.
         if (!model.containsAttribute("user")) {
             model.addAttribute("user", new UserRegistrationDto());
         }
         return "login";
     }
 
-    // Rota para a página de Hospedagem/Galeria. (gallery.html)
     @GetMapping("/hospedagem")
     public String gallery() {
         return "gallery";
@@ -40,25 +42,32 @@ public class WebController {
 
     /**
      * Rota para a página de Perfil.
-     * Os dados são temporários (mockup) até à implementação completa do Spring Security.
+     * Usa o Spring Security para buscar os dados reais do utilizador.
      */
     @GetMapping("/perfil")
     public String profile(Model model) {
 
-        // --- Dados Mockup Temporários (Substitua estes dados por dados reais de utilizador) ---
-        model.addAttribute("userName", "Mestre Tutor");
-        model.addAttribute("userFullName", "Brisa Pets - Sede");
-        model.addAttribute("userEmail", "geral@brisapets.pt");
-        model.addAttribute("userPhone", "+351 910 000 000");
-        model.addAttribute("userRole", "CLIENTE");
-        model.addAttribute("userAddressLine1", "Rua do Comércio, 10");
-        model.addAttribute("userAddressLine2", "1200-000 Lisboa");
+        try {
+            // 1. Obter o email (username) do utilizador logado do contexto de segurança
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return "profile"; // Assumindo que o template se chama 'profile.html'
+            // 2. Buscar o objeto User completo na base de dados
+            User user = userService.findByEmail(userEmail);
+
+            // 3. Passar o objeto User (entity) para o template com a chave "user"
+            model.addAttribute("user", user);
+
+        } catch (UsernameNotFoundException e) {
+            System.err.println("Erro de segurança: Utilizador autenticado não encontrado no DB.");
+            return "redirect:/logout";
+        } catch (Exception e) {
+            System.err.println("Erro inesperado ao carregar perfil: " + e.getMessage());
+            return "redirect:/logout";
+        }
+
+        return "profile"; // Busca o template profile.html
     }
 
-    // Rota para Sair/Logout - O Spring Security é que faz o trabalho, mas esta rota garante
-    // que, se for chamada diretamente, redireciona para o login.
     @GetMapping("/logout")
     public String logout() {
         return "redirect:/entrar";

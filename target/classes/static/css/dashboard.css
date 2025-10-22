@@ -541,3 +541,165 @@
 .action-icon i {
     margin-right: 5px;
 }
+/* ---------------------------------------------------------
+   Estilos para a Página Meu Perfil (profile.html)
+   --------------------------------------------------------- */
+
+.main-content-profile {
+    padding: 20px;
+    background-color: var(--color-background-light); /* Fundo cinza suave */
+    min-height: calc(100vh - 80px - 60px); /* 100% da altura menos header e footer */
+    display: flex;
+    justify-content: center; /* Centraliza o card horizontalmente */
+    align-items: flex-start; /* Alinha o card ao topo da seção */
+}
+
+.profile-container-card {
+    width: 100%;
+    max-width: 650px; /* Largura ideal para o card */
+    margin: 30px 0; /* Margem no topo e fundo */
+    background-color: var(--color-white);
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); /* Sombra mais destacada */
+    padding: 40px;
+    text-align: center;
+}
+
+.profile-title {
+    font-size: 1.8em;
+    color: var(--color-text-dark);
+    margin-bottom: 25px;
+    font-weight: 800;
+}
+
+/* AVATAR/ICONE */
+.profile-avatar {
+    font-size: 70px;
+    color: var(--color-primary);
+    margin-bottom: 15px;
+}
+
+.user-name {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin-bottom: 5px;
+}
+
+.user-role {
+    font-size: 0.9em;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 25px;
+}
+
+/* DIVISOR */
+.divider {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 30px 0;
+}
+
+/* LAYOUT DE ITENS DE DETALHE (GRID DE DUAS COLUNAS) */
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
+    gap: 30px 20px;
+    text-align: left;
+    margin-bottom: 40px;
+}
+
+.detail-item label {
+    display: block;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--color-primary); /* Destaca a label com a cor primária */
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.detail-item p {
+    font-size: 1em;
+    color: var(--color-text-light);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.detail-item .icon-detail {
+    margin-right: 8px;
+    font-size: 1em;
+}
+
+/* Item de Endereço (Ocupa a largura total na grid) */
+.detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+/* BOTÕES DE AÇÃO */
+.action-area {
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-edit-profile {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 25px;
+    background-color: var(--color-primary);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.btn-edit-profile:hover {
+    background-color: #d81b60; /* Cor primária mais escura no hover */
+}
+
+.btn-secondary-profile {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 25px;
+    background-color: var(--color-background-light);
+    color: var(--color-text-light);
+    border: 1px solid #ddd;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.btn-secondary-profile:hover {
+    background-color: #eee;
+}
+
+.btn-edit-profile i, .btn-secondary-profile i {
+    margin-right: 8px;
+}
+
+/* Media Query para telas menores (para garantir que a grid não quebre feio) */
+@media (max-width: 600px) {
+    .details-grid {
+        grid-template-columns: 1fr; /* Apenas uma coluna em telas muito pequenas */
+    }
+    .detail-item.full-width {
+        grid-column: auto;
+    }
+    .profile-container-card {
+        padding: 30px 20px;
+        margin: 20px 0;
+    }
+    .action-area {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .btn-edit-profile, .btn-secondary-profile {
+        width: 100%;
+        justify-content: center;
+    }
+}

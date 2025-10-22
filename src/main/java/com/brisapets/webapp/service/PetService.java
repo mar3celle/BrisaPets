@@ -23,7 +23,7 @@ public class PetService {
         return petRepository.save(pet);
     }
 
-    // 2. Método para buscar todos os Pets
+    // 2. Método para buscar todos os Pets (uso interno, ou para Admin)
     public List<Pet> findAllPets() {
         return petRepository.findAll();
     }
@@ -38,8 +38,12 @@ public class PetService {
         petRepository.deleteById(id);
     }
 
+    /**
+     * ✅ MÉTODO CORRIGIDO E FINAL:
+     * Usa o método findByTutorId(tutorId) declarado no PetRepository
+     * para devolver APENAS os pets pertencentes ao utilizador com o ID fornecido.
+     */
     public List<Pet> findPetsByTutor(Long tutorId) {
-        // return petRepository.findByTutorId(tutorId);
-        return petRepository.findAll();
+        return petRepository.findByTutorId(tutorId);
     }
 }
