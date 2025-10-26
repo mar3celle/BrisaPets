@@ -13,14 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.security.core.userdetails.UsernameNotFoundException; // Import necessário
-
-import java.time.DayOfWeek;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,13 +40,10 @@ public class AppointmentController {
      * MÉTODO DE AJUDA: Obtém o ID do utilizador logado usando o email do Spring Security.
      */
     private Long getLoggedInUserId() {
-        // 1. Obtém o email (username) do contexto de segurança
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
-            // 2. Busca o objeto User completo para obter o ID
             return userService.findByEmail(userEmail).getId();
         } catch (UsernameNotFoundException e) {
-            // Lança uma exceção de segurança para ser tratada em caso de erro.
             throw new SecurityException("Utilizador autenticado não encontrado na base de dados.", e);
         }
     }
@@ -72,16 +64,22 @@ public class AppointmentController {
         model.addAttribute("pets", pets);
 
         // 3. Lógica do Calendário (Mês Atual/Próximo)
-        YearMonth currentMonth = (year != null && month != null)
+        YearMonth currentYearMonth = (year != null && month != null)
                 ? YearMonth.of(year, month)
                 : YearMonth.now();
 
-        YearMonth nextMonth = currentMonth.plusMonths(1);
+        YearMonth prevMonth = currentYearMonth.minusMonths(1);
+        YearMonth nextMonth = currentYearMonth.plusMonths(1);
 
-        // 4. Adicionar os dados do Calendário ao Model
-        model.addAttribute("currentMonth", currentMonth);
-        model.addAttribute("nextMonth", nextMonth);
-        model.addAttribute("days", calculateCalendarDays(currentMonth));
+        // 4. Adicionar os dados do Calendário ao Model (CORREÇÃO DA INJEÇÃO DE VARIÁVEIS)
+        model.addAttribute("currentYearMonth", currentYearMonth);
+        model.addAttribute("prevMonthYear", prevMonth.getYear());
+        model.addAttribute("prevMonth", prevMonth.getMonthValue());
+        model.addAttribute("nextMonthYear", nextMonth.getYear());
+        model.addAttribute("nextMonth", nextMonth.getMonthValue());
+        model.addAttribute("currentDate", LocalDate.now()); // Necessário para desativar dias passados
+
+        model.addAttribute("days", calculateCalendarDays(currentYearMonth));
         model.addAttribute("appointmentForm", new Appointment());
 
         return "booking"; // Busca o template booking.html
@@ -133,8 +131,30 @@ public class AppointmentController {
         LocalDate firstOfMonth = yearMonth.atDay(1);
         int daysInMonth = yearMonth.lengthOfMonth();
 
+        // Obtém o valor do dia da semana (1=Segunda, 7=Domingo)
         int firstDayOfWeekValue = firstOfMonth.getDayOfWeek().getValue();
-        int padding = firstDayOfWeekValue % 7;
+        // Ajusta para o padding correto (se for Domingo, o padding deve ser 0 para começar na primeira coluna, ou 6 se a semana começar no domingo, mas aqui a grelha começa na Segunda)
+        // Para uma grelha que começa em Domingo: padding = firstDayOfWeekValue % 7;
+        // Para uma grelha que começa em Segunda (como no seu HTML): padding é 0 para Seg, 1 para Terça, etc.
+        // O valor 1 (Monday) no Java deve mapear para a primeira coluna no HTML.
+        // O valor 7 (Sunday) no Java deve mapear para a última coluna no HTML.
+
+        // Ajuste para o seu HTML: A sua grelha HTML começa em DOMINGO, mas o enum Java DayOfWeek começa em SEGUNDA (1).
+        // DOM: 7 (Java) -> 0 (Padding)
+        // SEG: 1 (Java) -> 1 (Padding)
+        // O seu HTML começa em DOM, por isso vamos usar 7 como o primeiro dia.
+        int dayOfWeekForCalendar = firstDayOfWeekValue % 7;
+        if (dayOfWeekForCalendar == 0) { // Se for domingo (7), torna-se 0 após o módulo.
+            dayOfWeekForCalendar = 7;
+        }
+
+        // Se o seu calendário no HTML começa em Domingo:
+        int padding;
+        if (dayOfWeekForCalendar == 7) { // Domingo
+            padding = 0;
+        } else {
+            padding = dayOfWeekForCalendar;
+        }
 
         List<Integer> days = new ArrayList<>();
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="pt-PT" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,73 +21,72 @@
         <a href="/pets" class="nav-link-icon"><i class="fas fa-paw"></i> Meus Pets</a>
         <a href="/agendar" class="nav-link-icon"><i class="fas fa-calendar-alt"></i> Agendar Serviço</a>
         <a href="/appointments" class="nav-link-icon"><i class="fas fa-list-alt"></i> Meus Agendamentos</a>
-        <a href="/hospedagem" class="nav-link-icon"><i class="fas fa-house-user"></i> Hospedagem</a>
-        <a href="/perfil" class="nav-link-icon active"><i class="fas fa-user-circle"></i> Meu Perfil</a>
-        <a th:href="@{/logout}" class="nav-link-icon sair" sec:authorize="isAuthenticated()"><i class="fas fa-sign-out-alt"></i> Sair</a>
+        <a href="/hospedagem" class="nav-link-icon"><i class="fas fa-bed"></i> Hospedagem</a>
+        <a href="/perfil" class="nav-link-icon active"><i class="fas fa-user-circle"></i> Perfil</a>
+        <a href="/logout" class="nav-link-icon sair"><i class="fas fa-sign-out-alt"></i> Sair</a>
     </nav>
 </header>
 
-<section class="main-content-profile">
-    <div class="profile-container-card">
+<section class="section-padded">
+    <div class="section-tag-small internal-tag">Configurações</div>
+    <h2 class="section-title">Bem-vindo(a), <span th:text="${user.firstName}">Nome do Tutor</span></h2>
+    <p class="section-subtitle">
+        Gerencie as suas informações de contacto e credenciais.
+    </p>
 
-        <h1 class="profile-title">Meu Perfil</h1>
+    <div class="profile-container">
+        <div class="profile-card">
+            <h3><i class="fas fa-user-circle"></i> Informações de Conta</h3>
+            <p><strong>Nome:</strong> <span th:text="${user.firstName} + ' ' + ${user.lastName}">Nome Completo</span></p>
+            <p><strong>Email:</strong> <span th:text="${user.email}">email@exemplo.com</span></p>
+            <p><strong>Telefone:</strong> <span th:text="${user.phone} ?: '+351 XXX XXX XXX'">+351 9XX XXX XXX</span></p>
 
-        <div class="profile-avatar">
-            <i class="fas fa-user-circle"></i>
+            <button class="btn btn-primary btn-sm" style="margin-top: 15px;"><i class="fas fa-edit"></i> Editar Informações</button>
         </div>
 
-        <h2 class="user-name" th:text="${user.firstName} + ' ' + ${user.lastName}">Nome Completo Aqui</h2>
+        <div class="profile-card">
+            <h3><i class="fas fa-lock"></i> Segurança</h3>
+            <p><strong>Senha:</strong> *********</p>
+            <p><strong>Tipo de Conta:</strong> <span th:text="${user.roles[0].name}">Cliente</span></p>
 
-        <p class="user-role" th:text="${user.roles[0].name} ?: 'CLIENTE'">CLIENTE</p>
-
-        <hr class="divider">
-
-        <div class="details-grid">
-
-            <div class="detail-item">
-                <label><i class="fas fa-envelope icon-detail"></i> Email</label>
-                <p th:text="${user.email}">email@exemplo.com</p>
-            </div>
-
-            <div class="detail-item">
-                <label><i class="fas fa-phone-alt icon-detail"></i> Telefone</label>
-                <p th:text="${user.phone} ?: 'Não Registado'">+351 910 000 000</p>
-            </div>
-
-            <div class="detail-item full-width">
-                <label><i class="fas fa-map-marker-alt icon-detail"></i> Morada</label>
-                <p th:text="${user.addressLine1} ?: 'Não Registado'">Rua Principal, 10</p>
-                <p th:text="${user.addressLine2} ?: ''">1200-000 Lisboa</p>
-            </div>
-
-            <div class="detail-item">
-                <label><i class="fas fa-calendar-alt icon-detail"></i> Membro Desde</label>
-                <p th:if="${user.createdAt}" th:text="${#temporals.format(user.createdAt, 'dd MMMM yyyy')}">22 Outubro 2024</p>
-                <p th:unless="${user.createdAt}">Não Registado</p>
-            </div>
-            <div class="detail-item">
-                <label><i class="fas fa-lock icon-detail"></i> Senha</label>
-                <p>********</p>
-            </div>
-
+            <button class="btn btn-secondary btn-sm" style="margin-top: 15px;"><i class="fas fa-key"></i> Alterar Senha</button>
         </div>
 
-        <div class="action-area">
-            <a href="/perfil/editar" class="btn btn-edit-profile">
-                <i class="fas fa-edit"></i> Editar Informações
-            </a>
-            <a href="/perfil/alterar-senha" class="btn btn-secondary-profile">
-                <i class="fas fa-key"></i> Alterar Senha
-            </a>
+        <div class="profile-card">
+            <h3><i class="fas fa-map-marker-alt"></i> Morada</h3>
+            <p th:text="${user.addressLine1} ?: 'Rua não definida'">Rua Exemplo, 123</p>
+            <p th:text="${user.addressLine2} ?: 'Localidade não definida'">Código Postal, Cidade</p>
+            <button class="btn btn-secondary btn-sm" style="margin-top: 15px;"><i class="fas fa-edit"></i> Editar Morada</button>
         </div>
 
     </div>
 </section>
 
-
-<footer class="footer">
-    <p>&copy; 2025 Brisa Pets. Todos os direitos reservados.</p>
-</footer>
+<style>
+    .profile-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+    .profile-card {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    .profile-card h3 {
+        color: #d81b60;
+        margin-bottom: 20px;
+    }
+    .profile-card p {
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+    .profile-card strong {
+        color: #333;
+    }
+</style>
 
 </body>
 </html>
