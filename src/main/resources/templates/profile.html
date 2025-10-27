@@ -34,6 +34,11 @@
         Gerencie as suas informações de contacto e credenciais.
     </p>
 
+    <!-- Mensagem de erro de deleção (se houver) -->
+    <div th:if="${error}" class="alert alert-error">
+        <i class="fas fa-times-circle"></i> <span th:text="${error}"></span>
+    </div>
+
     <div class="profile-container">
         <div class="profile-card">
             <h3><i class="fas fa-user-circle"></i> Informações de Conta</h3>
@@ -47,7 +52,8 @@
         <div class="profile-card">
             <h3><i class="fas fa-lock"></i> Segurança</h3>
             <p><strong>Senha:</strong> *********</p>
-            <p><strong>Tipo de Conta:</strong> <span th:text="${user.roles[0].name}">Cliente</span></p>
+            <!-- Acesso seguro ao primeiro Role -->
+            <p><strong>Tipo de Conta:</strong> <span th:text="${user.roles != null and user.roles.size() > 0} ? ${user.roles[0].name} : 'Sem Role'">Cliente</span></p>
 
             <button class="btn btn-secondary btn-sm" style="margin-top: 15px;"><i class="fas fa-key"></i> Alterar Senha</button>
         </div>
@@ -59,10 +65,54 @@
             <button class="btn btn-secondary btn-sm" style="margin-top: 15px;"><i class="fas fa-edit"></i> Editar Morada</button>
         </div>
 
+        <!-- NOVO CARTÃO: EXCLUSÃO DE CONTA -->
+        <div class="profile-card delete-card">
+            <h3><i class="fas fa-exclamation-triangle"></i> Excluir Conta</h3>
+            <p>A exclusão da conta é **permanente**. Todos os seus dados, incluindo Pets e Agendamentos, serão removidos e não poderão ser recuperados.</p>
+
+            <!-- Formulário que envia o POST para o Controller -->
+            <form th:action="@{/perfil/deletar}" method="POST" id="deleteAccountForm">
+                <!-- O botão chama a função JS de confirmação -->
+                <button type="button" onclick="showConfirmationModal()" class="btn btn-danger btn-sm" style="margin-top: 15px;">
+                    <i class="fas fa-trash-alt"></i> Excluir a Minha Conta
+                </button>
+            </form>
+        </div>
+
     </div>
 </section>
 
+<!-- Modal de Confirmação (Estilizado, pois não se pode usar 'confirm()') -->
+<div id="confirmationModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h4>Confirmação de Exclusão</h4>
+        <p>Tem **certeza absoluta** que deseja excluir a sua conta Brisa Pets? Esta ação não pode ser desfeita.</p>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeConfirmationModal()">Cancelar</button>
+            <button class="btn btn-danger" onclick="submitDeleteForm()">Sim, Excluir Permanentemente</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showConfirmationModal() {
+        document.getElementById('confirmationModal').style.display = 'flex';
+    }
+
+    function closeConfirmationModal() {
+        document.getElementById('confirmationModal').style.display = 'none';
+    }
+
+    function submitDeleteForm() {
+        // 1. Fecha o modal
+        closeConfirmationModal();
+        // 2. Envia o formulário
+        document.getElementById('deleteAccountForm').submit();
+    }
+</script>
+
 <style>
+    /* Estilos base (Mantenho os seus estilos e adiciono o necessário) */
     .profile-container {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -86,7 +136,66 @@
     .profile-card strong {
         color: #333;
     }
+
+    /* Estilo do novo Cartão de Deleção */
+    .delete-card {
+        border: 2px solid #dc3545; /* Cor vermelha de alerta */
+        background-color: #fcebeb; /* Fundo levemente avermelhado */
+    }
+    .delete-card h3 {
+        color: #dc3545;
+    }
+
+    /* Estilos do Modal */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(2px);
+    }
+    .modal-content {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        max-width: 450px;
+        width: 90%;
+        text-align: center;
+    }
+    .modal-content h4 {
+        color: #dc3545;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+    .modal-content p {
+        margin-bottom: 25px;
+        line-height: 1.5;
+    }
+    .modal-actions button {
+        margin: 0 10px;
+    }
+
+    /* Estilo para a mensagem de erro */
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
 </style>
 
 </body>
-</html>
+</html>>

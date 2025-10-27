@@ -53,7 +53,10 @@ public class SecurityConfig {
                                 "/", "/entrar", "/login", "/register", "/autenticar", "/perform_login" // <-- Incluir o POST URL aqui!
                         ).permitAll()
 
-                        // 3. O resto das rotas são privadas
+                        // ROTA DO PAINEL ADMIN: Requer a autoridade ROLE_ADMIN
+                        .requestMatchers("/admin").hasAuthority("ROLE_ADMIN")
+
+                        //  O resto das rotas são privadas
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -61,7 +64,7 @@ public class SecurityConfig {
                                 .loginProcessingUrl("/perform_login") // POST -> URL para onde o formulário envia dados
                                 .usernameParameter("username")
                                 .passwordParameter("password")
-                                .defaultSuccessUrl("/pets", true)
+                                .defaultSuccessUrl("/pets", true) // Assume /pets é a página inicial após login
                         // IMPORTANTE: REMOVIDO o .permitAll() redundante daqui.
                 )
                 .logout(logout -> logout
