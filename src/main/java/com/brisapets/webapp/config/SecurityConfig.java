@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -34,44 +35,48 @@ public class SecurityConfig {
     // Expõe o userService como UserDetailsService
     @Bean
     public UserDetailsService userDetailsService() {
-        // Assume que seu UserService implementa UserDetailsService e tem findByEmail/loadUserByUsername
-        return username -> (org.springframework.security.core.userdetails.UserDetails) userService.loadUserByUsername(username);
+        return userService;
     }
 
-    // Define as regras de acesso (URLs)
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(requests -> requests
-                        // ROTAS PÚBLICAS (Ajustado para ser limpo e claro)
-                        .requestMatchers(
-                                // 1. Recursos Estáticos (Sempre no topo)
-                                "/css/**", "/js/**", "/images/**",
+                        // 1. Recursos Estáticos (Sempre no topo)
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll() // ✅ Adicionado /webjars/** para ser seguro
 
-                                // 2. Rotas de Autenticação e Index
-                                "/", "/entrar", "/login", "/register", "/autenticar", "/perform_login" // <-- Incluir o POST URL aqui!
-                        ).permitAll()
+                        // 2. Rotas de Autenticação e Index
+                        .requestMatchers("/", "/entrar", "/login", "/register", "/autenticar", "/perform_login").permitAll()
 
-                        // ROTA DO PAINEL ADMIN: Requer a autoridade ROLE_ADMIN
-                        .requestMatchers("/admin").hasAuthority("ROLE_ADMIN")
+                        // Debug endpoint (temporary)
+                        .requestMatchers("/debug/**").authenticated()
 
-                        //  O resto das rotas são privadas
+                        // ROTA DO PAINEL ADMIN: Requer a ROLE_ADMIN (mais idiomático)
+                        .requestMatchers("/admin").hasRole("ADMIN")
+
+                        // O resto das rotas são privadas (ex: /perfil, /pets, /appointments)
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                                .loginPage("/autenticar")               // GET -> URL onde está a página HTML
-                                .loginProcessingUrl("/perform_login") // POST -> URL para onde o formulário envia dados
-                                .usernameParameter("username")
-                                .passwordParameter("password")
-                                .defaultSuccessUrl("/pets", true) // Assume /pets é a página inicial após login
-                        // IMPORTANTE: REMOVIDO o .permitAll() redundante daqui.
+                        .loginPage("/autenticar")
+                        .loginProcessingUrl("/perform_login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/pets", true)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")) // Adiciona o RequestMatcher
                         .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true) // 🌟 NOVO: Invalida a sessão
+                        .deleteCookies("JSESSIONID") // 🌟 NOVO: Deleta cookies de sessão
                         .permitAll()
+                )
+                // 🌟 NOVO: Tratamento de Exceção para Acesso Negado (403 Forbidden)
+                .exceptionHandling(exceptions -> exceptions
+                        .accessDeniedPage("/403") // Redireciona para uma página de erro 403
                 );
+
 
         return http.build();
     }

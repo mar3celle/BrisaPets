@@ -29,6 +29,8 @@ public class User {
     private String firstName;
     private String lastName;
     private String phone;
+    private String addressLine1;
+    private String addressLine2;
 
     // Relação com Perfis (Roles)
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

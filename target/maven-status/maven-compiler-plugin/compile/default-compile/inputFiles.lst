@@ -1,7 +1,9 @@
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/BrisaPetsApplication.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/config/BeanConfig.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/config/SecurityConfig.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/AdminController.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/AppointmentController.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/DebugController.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/PetController.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/UserRegistrationController.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/WebController.java

@@ -1,268 +1,79 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-PT" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brisa Pets - Painel de Administração</title>
-
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Font Awesome -->
+    <title>Brisa Pets - Painel Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-    <!-- CSS externo -->
-    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
-
-<body class="lg:flex">
-<!-- Sidebar -->
-<div id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 overflow-y-auto">
-    <div class="p-6">
-        <h1 class="text-2xl font-bold text-primary-bp flex items-center">
-            <i class="fas fa-heart text-3xl mr-2"></i> Brisa Pets
-            <span class="text-sm ml-2 text-gray-500 font-light">Admin</span>
-        </h1>
-    </div>
-    <nav class="mt-4">
-        <div id="nav-dashboard" class="sidebar-item active" onclick="navigate('dashboard')"><i class="fas fa-chart-line w-6"></i> Dashboard</div>
-        <div id="nav-reports" class="sidebar-item" onclick="navigate('reports')"><i class="fas fa-history w-6"></i> Relatórios</div>
-        <div id="nav-sitting" class="sidebar-item" onclick="navigate('sitting')"><i class="fas fa-camera w-6"></i> Diário Pet Sitting</div>
-        <div id="nav-clients" class="sidebar-item" onclick="navigate('clients')"><i class="fas fa-users w-6"></i> Clientes e Pets</div>
-        <div class="sidebar-item mt-8 text-gray-500"><i class="fas fa-sign-out-alt w-6"></i> Sair</div>
-    </nav>
-</div>
-
-<!-- Conteúdo principal -->
-<div class="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-10">
-    <button id="menu-toggle" class="lg:hidden fixed top-4 right-4 z-50 p-3 bg-primary-bp text-white rounded-full shadow-lg">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <h1 id="page-title" class="text-3xl font-bold mb-6 text-gray-800">Dashboard</h1>
-    <div id="main-content"></div>
-</div>
-
-<!-- Templates das páginas -->
-<!-- Copia aqui exatamente os <template> do arquivo original -->
-<!-- (dashboard-template, reports-template, sitting-template, appointment-form-template, clients-template) -->
-<!-- ########################### 1. DASHBOARD (Imagem 1) ########################### -->
-<template id="dashboard-template">
-    <div class="grid lg:grid-cols-4 gap-6">
-        <!-- Coluna Principal (Agendamentos e Estatísticas) -->
-        <div class="lg:col-span-3 space-y-8"> <!-- Próximos Agendamentos -->
-            <div class="card">
-                <h2 class="text-xl font-semibold mb-4 text-primary-bp">
-                    <i class="fas fa-clock mr-2"></i>
-                    Próximos Agendamentos</h2>
-                <div id="appointment-list" class="space-y-3">
-                    <!-- Lista de agendamentos será populada aqui -->
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="p-6">
+            <h1><i class="fas fa-heart"></i> Brisa Pets <span class="logo-sub">Admin</span></h1>
+            <nav>
+                <div class="sidebar-item active" id="nav-dashboard" onclick="navigate('dashboard')">
+                    <i class="fas fa-chart-line"></i> Dashboard
                 </div>
-            </div>
-            <!-- Estatísticas do Negócio -->
-            <div class="card"> <h2 class="text-xl font-semibold mb-6 text-primary-bp">
-                <i class="fas fa-chart-bar mr-2">
-
-                </i> Estatísticas do Negócio (Mês Atual)</h2>
-                <!-- Resumo Mensal -->
-                <div class="grid sm:grid-cols-3 gap-4 mb-8">
-                    <div class="bg-primary-bp/10 p-4 rounded-lg">
-                        <p class="text-xs font-medium text-gray-500">Agendamentos (Banho/Tosquia)</p>
-                        <p id="stat-appointments" class="text-2xl font-bold text-primary-bp mt-1">--</p>
-                    </div>
-                    <div class="bg-primary-bp/10 p-4 rounded-lg">
-                        <p class="text-xs font-medium text-gray-500">Total Faturado</p>
-                        <p id="stat-revenue" class="text-2xl font-bold text-gray-700 mt-1">€ --</p>
-                    </div>
-                    <div class="bg-primary-bp/10 p-4 rounded-lg">
-                        <p class="text-xs font-medium text-gray-500">Pet Sitting / Hospedagem</p>
-                        <p id="stat-sitting-revenue" class="text-2xl font-bold text-gray-700 mt-1">€ --</p>
-                    </div>
+                <div class="sidebar-item" id="nav-reports" onclick="navigate('reports')">
+                    <i class="fas fa-file-alt"></i> Relatórios
                 </div>
-                <!-- Gráfico de Utilização de Serviços -->
-                <h3 class="text-lg font-medium mb-3">Serviços Mais Utilizados</h3>
-                <div class="h-64"> <canvas id="servicesChart"></canvas>
+                <div class="sidebar-item" id="nav-clients" onclick="navigate('clients')">
+                    <i class="fas fa-users"></i> Clientes
                 </div>
-            </div>
-        </div>
-        <!-- Coluna de Atalhos (Ações Rápidas) -->
-        <div class="lg:col-span-1 space-y-6">
-            <!-- Atalhos Principais -->
-            <div class="card space-y-4"> <h3 class="text-lg font-semibold text-gray-700">Ações Rápidas</h3>
-                <button onclick="navigate('appointment_form')" class="w-full btn bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200"> <i class="fas fa-plus-circle mr-2">
-
-                </i> Adicionar Agendamento </button>
-                <button onclick="navigate('reports')" class="w-full btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200"> <i class="fas fa-file-alt mr-2">
-
-                </i> Relatórios </button>
-            </div>
-            <!-- Navegação Secundária -->
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="navigate('clients')" class="card text-center py-6 hover:bg-gray-50 transition duration-200">
-                    <i class="fas fa-users text-3xl text-primary-bp"></i>
-                    <p class="text-sm font-medium mt-2">Clientes</p> </button>
-                <button onclick="navigate('sitting')" class="card text-center py-6 hover:bg-gray-50 transition duration-200">
-                    <i class="fas fa-bed text-3xl text-primary-bp"></i>
-                    <p class="text-sm font-medium mt-2">Sitting</p>
-                </button>
-            </div>
+            </nav>
         </div>
     </div>
-</template>
-<!-- ########################### 2. RELATÓRIOS (Imagem 2) ########################### -->
-<template id="reports-template">
-    <div class="card space-y-6">
-        <h2 class="text-xl font-semibold text-primary-bp">
-            <i class="fas fa-history mr-2"></i> Histórico Completo de Serviços</h2>
-        <!-- Filtros e Ações -->
-        <div class="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-end">
-            <div class="flex gap-4">
-                <div> <label for="start-date" class="text-sm block mb-1">Data Início:</label>
-                    <input type="date" id="start-date" class="border border-gray-300 rounded-md p-2">
-                </div> <
-                div>
-                <label for="end-date" class="text-sm block mb-1">Data Fim:</label>
-                <input type="date" id="end-date" class="border border-gray-300 rounded-md p-2"> </div>
-            <button class="self-end bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md transition duration-200"> Filtrar </button>
-        </div>
-        <button onclick="window.print()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition duration-200 sm:w-auto w-full">
-            <i class="fas fa-print mr-2"></i> Imprimir Período Selecionado
-        </button>
-    </div>
-    <!-- Tabela de Histórico (Mock Data) -->
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-            <thead class="bg-gray-100"> <tr> <th class="py-3 px-4 text-left text-xs font-semibold uppercase tracking-wider">Data</th>
-                <th class="py-3 px-4 text-left text-xs font-semibold uppercase tracking-wider">Serviço</th>
-                <th class="py-3 px-4 text-left text-xs font-semibold uppercase tracking-wider">Pet</th>
-                <th class="py-3 px-4 text-left text-xs font-semibold uppercase tracking-wider">Tutor</th>
-                <th class="py-3 px-4 text-right text-xs font-semibold uppercase tracking-wider">Valor (€)</th>
-                <th class="py-3 px-4 text-center text-xs font-semibold uppercase tracking-wider">Status</th>
-            </tr>
-            </thead>
-            <tbody id="reports-table-body">
-            <!-- Conteúdo será populado por JS -->
-            </tbody>
-        </table>
-    </div>
-    </div>
-</template>
-<!-- ########################### 3. PET SITTING DIARY (Imagem 3) ########################### -->
-<template id="sitting-template">
-    <div class="card space-y-6">
-        <h2 class="text-xl font-semibold text-primary-bp">
-            <i class="fas fa-camera mr-2"> </i> Diário do Pet Sitting / Hospedagem</h2>
-        <!-- Controles (Filtros e Upload) -->
-        <div class="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
-            <div class="flex gap-4"> <select id="sitting-filter" class="border border-gray-300 rounded-md p-2">
-                <option value="ativo">Pet Sitting Ativos</option>
-                <option value="expirado">Expirados</option>
-            </select>
-            </div>
-            <button onclick="document.getElementById('upload-input').click()" class="bg-primary-bp hover:bg-primary-bp/90 text-white py-2 px-4 rounded-md transition duration-200 sm:w-auto w-full"> <i class="fas fa-upload mr-2"></i> Upload Fotos
-            </button> <input type="file" id="upload-input" multiple class="hidden"> </div>
-        <!-- Lista de Sessões de Sitting -->
-        <div id="sitting-sessions-list" class="space-y-6">
-            <!-- Sessions will be populated here -->
-        </div>
-    </div>
-</template>
-<!-- ########################### 4. AGENDAR / ADICIONAR AGENDAMENTO (Imagem 4) ########################### -->
-<template id="appointment-form-template">
-    <div class="grid lg:grid-cols-3 gap-6">
-        <!-- Coluna 1: Calendário de Seleção -->
-        <div class="lg:col-span-2 card p-4">
-            <h2 class="text-xl font-semibold mb-4 text-primary-bp">
-                <i class="fas fa-calendar-alt mr-2"></i> Selecionar Data e Período</h2>
-            <div class="flex justify-between items-center mb-4">
-                <button class="text-2xl text-gray-600 hover:text-primary-bp" onclick="changeMonth(-1)">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h3 id="calendar-title" class="text-lg font-bold">Novembro 2025</h3>
-                <button class="text-2xl text-gray-600 hover:text-primary-bp" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-            <!-- Grelha do Calendário -->
-            <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center">
-                <div class="font-bold text-sm py-2 text-red-600">DOM</div> <div class="font-bold text-sm py-2">SEG</div> <div class="font-bold text-sm py-2">TER</div> <div class="font-bold text-sm py-2">QUA</div> <div class="font-bold text-sm py-2">QUI</div> <div class="font-bold text-sm py-2">SEX</div> <div class="font-bold text-sm py-2 text-blue-600">SÁB</div>
-                <!-- Dias serão populados por JS -->
-            </div>
-        </div>
-        <!-- Coluna 2: Formulário de Detalhes -->
-        <div class="lg:col-span-1 card p-4 space-y-4">
-            <h2 class="text-xl font-semibold text-primary-bp">
-                <i class="fas fa-paw mr-2"></i> Detalhes do Agendamento</h2>
-            <div id="selected-date-display" class="bg-gray-100 p-3 rounded-md text-center font-medium"> Selecione uma data no calendário. </div>
-            <form id="appointment-details-form" class="space-y-4">
-                <div>
-                    <label class="text-sm font-medium block mb-1">Tipo de Serviço:</label>
-                    <select id="service-type" class="w-full border border-gray-300 rounded-md p-2 focus:ring-primary-bp focus:border-primary-bp">
-                        <option value="banho">Banho e Tosquia</option>
-                        <option value="sitting">Pet Sitting / Hospedagem</option>
-                    </select>
-                </div>
-                <div id="time-slot-container">
-                    <label class="text-sm font-medium block mb-1">Horário:</label>
-                    <input type="time" required class="w-full border border-gray-300 rounded-md p-2">
-                </div>
-                <div id="period-container" class="hidden">
-                    <label class="text-sm font-medium block mb-1">Período de Hospedagem:</label>
-                    <input type="date" required class="w-full border border-gray-300 rounded-md p-2 mb-2" placeholder="Data de Início">
-                    <input type="date" required class="w-full border border-gray-300 rounded-md p-2" placeholder="Data de Fim">
-                </div>
-                <div>
-                    <label class="text-sm font-medium block mb-1">Nome do Pet (Busca Inteligente):
-                    </label>
-                    <input type="text" id="pet-search" placeholder="Ex: Max" required class="w-full border border-gray-300 rounded-md p-2" oninput="searchClient()">
-                    <div id="search-results" class="absolute bg-white border border-gray-200 w-full mt-1 max-h-40 overflow-y-auto z-10 hidden">
 
-                    </div>
-                </div>
-                <div>
-                    <label class="text-sm font-medium block mb-1">Detalhes (Obs):</label>
-                    <textarea rows="2" class="w-full border border-gray-300 rounded-md p-2"></textarea>
-                </div>
-                <button type="submit" class="w-full bg-primary-bp hover:bg-primary-bp/90 text-white font-bold py-3 rounded-lg transition duration-200"> Confirmar Agendamento
-                </button>
-            </form>
+    <div class="main-wrapper">
+        <h1 id="page-title">Painel de Administração</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-title">Total Utilizadores</div>
+                <div class="stat-value" th:text="${allUsers.size()}">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Total Pets</div>
+                <div class="stat-value" th:text="${allPets.size()}">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Total Agendamentos</div>
+                <div class="stat-value" th:text="${allAppointments.size()}">0</div>
+            </div>
         </div>
-    </div>
-</template>
-< !-- ########################### 5. CLIENTES E PETS (Rota Simples) ########################### -->
-<template id="clients-template">
-    <div class="card space-y-6">
-        <h2 class="text-xl font-semibold text-primary-bp">
-            <i class="fas fa-users mr-2"></i> Gestão de Clientes e Pets</h2>
-        <div class="flex justify-between items-center">
-            <h3 class="text-lg font-medium">Lista de Clientes</h3>
-            <button class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md transition duration-200">
-                <i class="fas fa-user-plus mr-2"></i> Adicionar Novo Cliente
-            </button>
-        </div>
-        <!-- Tabela de Clientes -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                <thead class="bg-gray-100">
-                <tr>
-                    <th class="py-3 px-4 text-left text-xs font-semibold uppercase tracking-wider">Tutor</th>
-                    <th class="py-3 px-4 text-left text-xs font-semibold uppercase tracking-wider">Email</th>
-                    <th class="py-3 px-4 text-left text-xs font-semibold uppercase tracking-wider">Telefone</th>
-                    <th class="py-3 px-4 text-left text-xs font-semibold uppercase tracking-wider">Pets</th>
-                    <th class="py-3 px-4 text-center text-xs font-semibold uppercase tracking-wider">Ações</th>
-                </tr>
+
+        <div class="card" style="margin-top: 2rem;">
+            <h3>Utilizadores</h3>
+            <table style="width: 100%; margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Ações</th>
+                    </tr>
                 </thead>
-                <tbody id="clients-table-body">
-                <!-- Conteúdo será populado por JS -->
+                <tbody>
+                    <tr th:each="user : ${allUsers}">
+                        <td th:text="${user.firstName + ' ' + user.lastName}">Nome</td>
+                        <td th:text="${user.email}">email@example.com</td>
+                        <td>
+                            <span th:each="role : ${user.roles}" th:text="${role.name}" class="badge badge-new"></span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/user/delete/{id}(id=${user.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="btn-confirm" onclick="return confirm('Eliminar utilizador?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
-</template>
-<!-- ----------------------- LÓGICA JAVASCRIPT ----------------------- -->
-
-<script src="admin.js"></script>
 </body>
 </html>
