@@ -7,6 +7,9 @@
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/PetController.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/UserRegistrationController.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/controller/WebController.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/dto/UserAddressUpdateDto.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/dto/UserPasswordUpdateDto.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/dto/UserProfileUpdateDto.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/dto/UserRegistrationDto.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/model/Appointment.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/model/Pet.java

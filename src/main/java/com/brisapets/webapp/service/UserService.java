@@ -1,6 +1,9 @@
 package com.brisapets.webapp.service;
 
 import com.brisapets.webapp.dto.UserRegistrationDto;
+import com.brisapets.webapp.dto.UserProfileUpdateDto;
+import com.brisapets.webapp.dto.UserPasswordUpdateDto;
+import com.brisapets.webapp.dto.UserAddressUpdateDto;
 import com.brisapets.webapp.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,4 +34,9 @@ public interface UserService extends UserDetailsService {
 
     // Método para buscar um utilizador pelo ID
     Optional<User> findUserById(Long id);
+
+    // Profile update methods
+    void updateProfile(Long userId, UserProfileUpdateDto profileDto);
+    void updatePassword(Long userId, UserPasswordUpdateDto passwordDto);
+    void updateAddress(Long userId, UserAddressUpdateDto addressDto);
 }

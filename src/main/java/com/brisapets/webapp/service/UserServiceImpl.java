@@ -1,6 +1,9 @@
 package com.brisapets.webapp.service;
 
 import com.brisapets.webapp.dto.UserRegistrationDto;
+import com.brisapets.webapp.dto.UserProfileUpdateDto;
+import com.brisapets.webapp.dto.UserPasswordUpdateDto;
+import com.brisapets.webapp.dto.UserAddressUpdateDto;
 import com.brisapets.webapp.model.Role;
 import com.brisapets.webapp.model.User;
 import com.brisapets.webapp.repository.RoleRepository;
@@ -132,5 +135,38 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public void updateProfile(Long userId, UserProfileUpdateDto profileDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setFirstName(profileDto.getFirstName());
+        user.setLastName(profileDto.getLastName());
+        user.setPhone(profileDto.getPhone());
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updatePassword(Long userId, UserPasswordUpdateDto passwordDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (!passwordEncoder.matches(passwordDto.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Senha atual incorreta");
+        }
+        
+        user.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updateAddress(Long userId, UserAddressUpdateDto addressDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setAddress(addressDto.getAddress());
+        user.setCity(addressDto.getCity());
+        user.setZipCode(addressDto.getZipCode());
+        userRepository.save(user);
     }
 }

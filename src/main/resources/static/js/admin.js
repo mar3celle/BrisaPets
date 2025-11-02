@@ -4,44 +4,8 @@ let currentYearMonth = new Date();
 let selectedDate = null;
 let chartInstance = null;
 
-// --- MOCK DATA (Dados de Exemplo) ---
-const mockAppointments = [
-    { id: 1, date: '2025-10-28', time: '10:00', pet: 'Max', tutor: 'Ana Silva', service: 'Banho e Tosquia', status: 'Novo' },
-    { id: 2, date: '2025-10-28', time: '14:30', pet: 'Bobi', tutor: 'João Santos', service: 'Banho Rápido', status: 'Confirmado' },
-    { id: 3, date: '2025-10-29', time: '09:00', pet: 'Luna', tutor: 'Maria Gomes', service: 'Pet Sitting', period: '29/10 - 02/11', status: 'Novo' },
-    { id: 4, date: '2025-10-29', time: '16:00', pet: 'Simba', tutor: 'Carla Dias', service: 'Banho e Tosquia', status: 'Confirmado' },
-    { id: 5, date: '2025-10-30', time: '11:00', pet: 'Mel', tutor: 'Pedro Sousa', service: 'Banho Rápido', status: 'Novo' },
-];
-
-const mockStats = {
-    totalAppointments: 45,
-    totalRevenue: 2890.50,
-    sittingRevenue: 650.00,
-    servicesUsage: {
-        'Banho e Tosquia': 20,
-        'Banho Rápido': 15,
-        'Pet Sitting': 5,
-        'Hospedagem': 5
-    }
-};
-
-const mockReports = [
-     { date: '2025-10-15', service: 'Banho e Tosquia', pet: 'Toby', tutor: 'Ana Silva', value: 35.00, status: 'Concluído' },
-     { date: '2025-10-10', service: 'Pet Sitting (5 dias)', pet: 'Rex', tutor: 'Pedro Sousa', value: 150.00, status: 'Concluído' },
-     { date: '2025-10-05', service: 'Banho Rápido', pet: 'Max', tutor: 'Ana Silva', value: 20.00, status: 'Concluído' },
-];
-
-const mockSittings = [
-    { id: 101, pet: 'Simba', tutor: 'Carla Dias', period: '25/10/2025 - 30/10/2025', status: 'Ativo', photoCount: 3, photos: ['placeholder.png', 'placeholder.png', 'placeholder.png'] },
-    { id: 102, pet: 'Rex', tutor: 'Pedro Sousa', period: '01/10/2025 - 05/10/2025', status: 'Expirado', photoCount: 10, photos: ['placeholder.png', 'placeholder.png', 'placeholder.png'] },
-    { id: 103, pet: 'Kika', tutor: 'Mariana Lima', period: '28/10/2025 - 05/11/2025', status: 'Ativo', photoCount: 1, photos: ['placeholder.png'] },
-];
-
-const mockUsers = [
-    { id: 201, name: 'Ana Silva', phone: '911 223 344', email: 'ana@example.com', pets: ['Max', 'Toby'] },
-    { id: 202, name: 'João Santos', phone: '934 567 890', email: 'joao@example.com', pets: ['Bobi'] },
-    { id: 203, name: 'Maria Gomes', phone: '960 123 456', email: 'maria@example.com', pets: ['Luna'] },
-];
+// Data should be fetched from backend APIs instead of hardcoded mock data
+// TODO: Replace with actual API calls to backend services
 
 // --- FUNÇÕES DE NAVEGAÇÃO E RENDERIZAÇÃO ---
 
@@ -171,13 +135,16 @@ function renderAppointments() {
 }
 
 function confirmAppointment(id) {
-    const appt = mockAppointments.find(a => a.id === id);
-    if (appt && appt.status === 'Novo') {
-        appt.status = 'Confirmado';
-        renderAppointments(); // Redesenha a lista
-        // substitui alerta por pequena notificação possivel (por enquanto alert)
-        alert('Agendamento confirmado para o Pet: ' + appt.pet);
-    }
+    // Should make API call to backend to confirm appointment
+    fetch(`/api/appointments/${id}/confirm`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                renderAppointments();
+                showNotification('Agendamento confirmado com sucesso!');
+            }
+        })
+        .catch(error => console.error('Error confirming appointment:', error));
 }
 
 function renderStats() {

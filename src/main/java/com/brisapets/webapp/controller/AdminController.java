@@ -57,7 +57,14 @@ public class AdminController {
     @PostMapping("/admin/user/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            // Chama o novo método de serviço para eliminação
+            // Prevent self-deletion
+            String currentUserEmail = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+            User currentUser = userService.findByEmail(currentUserEmail);
+            if (currentUser.getId().equals(id)) {
+                redirectAttributes.addFlashAttribute("adminError", "Não pode deletar a sua própria conta.");
+                return "redirect:/admin";
+            }
+            
             userService.deleteUserById(id);
             redirectAttributes.addFlashAttribute("adminMessage", "Utilizador com ID " + id + " removido com sucesso.");
         } catch (Exception e) {

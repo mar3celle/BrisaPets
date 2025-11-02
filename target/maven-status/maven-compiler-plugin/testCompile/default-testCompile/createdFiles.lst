@@ -1,4 +1,3 @@
-com/brisapets/webapp/BrisaPetsApplicationTests.class
 com/brisapets/webapp/service/PetServiceTest.class
 com/brisapets/webapp/service/AppointmentServiceTest.class
 com/brisapets/webapp/controller/AppointmentControllerTest.class

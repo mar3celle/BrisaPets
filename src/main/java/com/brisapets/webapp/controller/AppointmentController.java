@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -27,13 +30,18 @@ public class AppointmentController {
     private final PetService petService;
     private final AppointmentService appointmentService;
     private final UserService userService;
+    private final PricingService pricingService;
+    private final CalendarService calendarService;
 
-    // Construtor com as TRÊS injeções de dependência
     @Autowired
-    public AppointmentController(PetService petService, AppointmentService appointmentService, UserService userService) {
+    public AppointmentController(PetService petService, AppointmentService appointmentService, 
+                               UserService userService, PricingService pricingService, 
+                               CalendarService calendarService) {
         this.petService = petService;
         this.appointmentService = appointmentService;
         this.userService = userService;
+        this.pricingService = pricingService;
+        this.calendarService = calendarService;
     }
 
     /**
@@ -47,6 +55,8 @@ public class AppointmentController {
             throw new SecurityException("Utilizador autenticado não encontrado na base de dados.", e);
         }
     }
+
+
 
 
     // 1. Mapeamento para exibir a página de agendamento com calendário dinâmico
@@ -79,7 +89,7 @@ public class AppointmentController {
         model.addAttribute("nextMonth", nextMonth.getMonthValue());
         model.addAttribute("currentDate", LocalDate.now()); // Necessário para desativar dias passados
 
-        model.addAttribute("days", calculateCalendarDays(currentYearMonth));
+        model.addAttribute("calendarDays", calendarService.calculateCalendarDays(currentYearMonth));
         model.addAttribute("appointmentForm", new Appointment());
 
         return "booking"; // Busca o template booking.html
@@ -110,13 +120,17 @@ public class AppointmentController {
         if (optionalPet.isPresent()) {
             // CRÍTICO: Garantir que o Pet pertence ao utilizador logado
             if (!optionalPet.get().getTutorId().equals(getLoggedInUserId())) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Erro: Tentativa de agendar serviço para um Pet não registado na sua conta.");
+                redirectAttributes.addFlashAttribute("errorMessage", "Erro: Pet não encontrado na sua conta.");
                 return "redirect:/agendar";
             }
 
             appointment.setPet(optionalPet.get());
+            
+            // 2. Definir o preço do serviço
+            appointment.setValue(pricingService.getServicePrice(appointment.getServiceName()));
+            appointment.setIsPaid(false); // Por defeito não pago
 
-            // 2. Salvar o agendamento
+            // 3. Salvar o agendamento
             appointmentService.saveAppointment(appointment);
             redirectAttributes.addFlashAttribute("successMessage", "Agendamento criado com sucesso!");
         } else {
@@ -126,47 +140,5 @@ public class AppointmentController {
         return "redirect:/appointments";
     }
 
-    // 4. MÉTODO AUXILIAR ESSENCIAL: Lógica para gerar a grelha do calendário
-    private List<Integer> calculateCalendarDays(YearMonth yearMonth) {
-        LocalDate firstOfMonth = yearMonth.atDay(1);
-        int daysInMonth = yearMonth.lengthOfMonth();
 
-        // Obtém o valor do dia da semana (1=Segunda, 7=Domingo)
-        int firstDayOfWeekValue = firstOfMonth.getDayOfWeek().getValue();
-        // Ajusta para o padding correto (se for Domingo, o padding deve ser 0 para começar na primeira coluna, ou 6 se a semana começar no domingo, mas aqui a grelha começa na Segunda)
-        // Para uma grelha que começa em Domingo: padding = firstDayOfWeekValue % 7;
-        // Para uma grelha que começa em Segunda (como no seu HTML): padding é 0 para Seg, 1 para Terça, etc.
-        // O valor 1 (Monday) no Java deve mapear para a primeira coluna no HTML.
-        // O valor 7 (Sunday) no Java deve mapear para a última coluna no HTML.
-
-        // Ajuste para o seu HTML: A sua grelha HTML começa em DOMINGO, mas o enum Java DayOfWeek começa em SEGUNDA (1).
-        // DOM: 7 (Java) -> 0 (Padding)
-        // SEG: 1 (Java) -> 1 (Padding)
-        // O seu HTML começa em DOM, por isso vamos usar 7 como o primeiro dia.
-        int dayOfWeekForCalendar = firstDayOfWeekValue % 7;
-        if (dayOfWeekForCalendar == 0) { // Se for domingo (7), torna-se 0 após o módulo.
-            dayOfWeekForCalendar = 7;
-        }
-
-        // Se o seu calendário no HTML começa em Domingo:
-        int padding;
-        if (dayOfWeekForCalendar == 7) { // Domingo
-            padding = 0;
-        } else {
-            padding = dayOfWeekForCalendar;
-        }
-
-        List<Integer> days = new ArrayList<>();
-
-        // Adiciona preenchimento (nulls)
-        for (int i = 0; i < padding; i++) {
-            days.add(null);
-        }
-
-        // Adiciona dias reais do mês
-        for (int i = 1; i <= daysInMonth; i++) {
-            days.add(i);
-        }
-        return days;
-    }
 }

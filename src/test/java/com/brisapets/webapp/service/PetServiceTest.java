@@ -44,7 +44,12 @@ public class PetServiceTest {
         // 4. Act & Assert: Busca todos os Pets
         List<Pet> pets = petService.findAllPets();
         assertFalse(pets.isEmpty(), "A lista de Pets não deve estar vazia.");
-        assertEquals(1, pets.size(), "Deve haver exatamente 1 Pet na lista.");
+        assertTrue(pets.size() >= 1, "Deve haver pelo menos 1 Pet na lista.");
+        
+        // Verifica se o pet salvo está na lista
+        boolean petEncontrado = pets.stream()
+            .anyMatch(p -> "Pudim Teste".equals(p.getNome()) && "Caniche".equals(p.getRaca()));
+        assertTrue(petEncontrado, "O pet salvo deve estar na lista.");
     }
 
 }

@@ -1,4 +1,3 @@
-
 package com.brisapets.webapp.model;
 
 import jakarta.persistence.*;
@@ -29,8 +28,11 @@ public class User {
     private String firstName;
     private String lastName;
     private String phone;
-    private String addressLine1;
-    private String addressLine2;
+
+    // NOVOS CAMPOS DE MORADA
+    private String address;
+    private String city;
+    private String zipCode; // Ex: 4700-000
 
     // Relação com Perfis (Roles)
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -40,4 +42,14 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Collection<Role> roles = new HashSet<>();
+
+    // Construtor usado no UserServiceImpl para Registo
+    public User(String email, String password, String firstName, String lastName, String phone, Collection<Role> roles) {
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.roles = roles;
+    }
 }

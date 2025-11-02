@@ -34,6 +34,7 @@ public class AppointmentServiceTest {
         pet.setNome("Bolinha");
         pet.setRaca("Poodle");
         pet.setIdade(5);
+        pet.setCastrado(true);
         pet.setTutorId(1L);
         Pet savedPet = petRepository.save(pet);
 
@@ -42,6 +43,8 @@ public class AppointmentServiceTest {
         newAppointment.setServiceName("Banho e Tosquia Geral");
         newAppointment.setAppointmentDateTime(LocalDateTime.of(2025, 11, 20, 14, 0));
         newAppointment.setPet(savedPet);
+        newAppointment.setValue(new java.math.BigDecimal("50.00"));
+        newAppointment.setIsPaid(false);
 
         // ACT: Salvar o Agendamento
         Appointment savedAppointment = appointmentService.saveAppointment(newAppointment);

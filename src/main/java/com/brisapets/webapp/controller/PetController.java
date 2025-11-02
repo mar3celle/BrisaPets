@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class PetController {
@@ -32,10 +33,12 @@ public class PetController {
      * NOVO MÉTODO DE AJUDA: Obtém o ID do utilizador logado usando o email
      */
     private Long getLoggedInUserId() {
-        // Obtém o email (username) do contexto de segurança
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        // Busca o objeto User completo para obter o ID
-        return userService.findByEmail(userEmail).getId();
+        try {
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            return userService.findByEmail(userEmail).getId();
+        } catch (Exception e) {
+            throw new SecurityException("Utilizador autenticado não encontrado na base de dados.", e);
+        }
     }
 
 
@@ -70,10 +73,21 @@ public class PetController {
     // 3. Mapeamento para deletar um Pet
     @PostMapping("/pets/delete/{id}")
     public String deletePet(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-
-
-
         try {
+            // SECURITY: Verify pet ownership before deletion
+            Optional<Pet> petOpt = petService.findPetById(id);
+            if (petOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Pet não encontrado.");
+                return "redirect:/pets";
+            }
+            
+            Pet pet = petOpt.get();
+            Long currentUserId = getLoggedInUserId();
+            if (pet.getTutorId() == null || !pet.getTutorId().equals(currentUserId)) {
+                redirectAttributes.addFlashAttribute("error", "Não tem permissão para deletar este Pet.");
+                return "redirect:/pets";
+            }
+            
             petService.deletePet(id);
             redirectAttributes.addFlashAttribute("message", "Pet deletado com sucesso!");
         } catch (Exception e) {
