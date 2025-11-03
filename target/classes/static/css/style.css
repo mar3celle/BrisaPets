@@ -173,6 +173,104 @@ h1, h2, h3 {
 .nav-menu a {
     margin-left: 25px;
 }
+/* -------------------------
+   Hamburger + mobile nav
+   ------------------------- */
+
+/* Toggle (hamburger) - escondido por defeito (desktop) */
+.nav-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    margin-left: 10px;
+    align-self: center;
+}
+
+/* barras do hamburger */
+.nav-toggle .bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    margin: 4px 0;
+    background: var(--color-text-dark);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Garantir que o nav é horizontal por defeito (desktop) */
+.nav-menu {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Pequeno ajuste no botão Entrar no header */
+.btn-header {
+    margin-left: 20px;
+}
+
+/* -------------------------
+   Mobile: comportamento do header
+   ------------------------- */
+@media (max-width: 600px) {
+    /* mostra o toggle */
+    .nav-toggle {
+        display: inline-block;
+    }
+
+    /* Oculta a nav por defeito no mobile; será mostrada quando .open estiver presente */
+    .nav-menu {
+        display: none;
+        position: absolute;
+        top: 64px; /* ajustar se necessário para corresponder à altura real do header */
+        left: 5%;
+        right: 5%;
+        background: var(--color-white);
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        padding: 12px;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 2000;
+    }
+
+    .nav-menu a {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--color-text-dark);
+    }
+
+    /* Quando aberto, mostrar a nav */
+    .nav-menu.open {
+        display: flex;
+    }
+
+    /* Colocar Entrar alinhado à direita do header (ou conforme preferires) */
+    .btn-header {
+        order: 3;
+        align-self: center;
+        width: auto;
+        margin-top: 6px;
+    }
+
+    /* Ajustes para .logo-container: logo à esquerda, toggle à direita */
+    .logo-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    /* animação do ícone quando aberto */
+    .nav-toggle.open .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-toggle.open .bar:nth-child(2) { opacity: 0; }
+    .nav-toggle.open .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    /* z-index extra para garantir que o header fica acima do hero */
+    .header { z-index: 1100; }
+}
 
 
 /*
@@ -279,7 +377,7 @@ h1, h2, h3 {
 */
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 30px;
     text-align: left;
 }
@@ -388,7 +486,7 @@ h1, h2, h3 {
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 30px;
 }
 
@@ -427,52 +525,36 @@ h1, h2, h3 {
     color: var(--color-text-light);
     font-size: 0.9em;
 }
+/* -------------------------------------------------------------------------- */
+/* MEDIA QUERIES PARA RESPONSIVIDADE DO GRID DE SERVIÇOS */
+/* -------------------------------------------------------------------------- */
 
-/*
-    ---------------------------------------------------------
-    MEDIA QUERIES (Responsividade básica para celular)
-    ---------------------------------------------------------
-*/
-@media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        padding: 10px 5%;
-        position: static;
-    }
-    .nav-menu {
-        margin-top: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        align-items: center;
-    }
-    .nav-menu a {
-        margin-left: 0;
-    }
-    .hero-section {
-        height: auto;
-        padding: 120px 5% 80px 5%;
-    }
-    .hero-content h1 {
-        font-size: 3em;
-    }
-    .hero-content h2 {
-        font-size: 1.5em;
-    }
-    .hero-actions {
-        flex-direction: column;
-    }
-    .get-in-touch-circle {
-        display: none; /* Esconde o elemento flutuante no celular */
-    }
-    .mission-vision-grid {
-        flex-direction: column;
-    }
-    .section-title {
-        font-size: 2em;
+/* Tablet Grande e Laptops (ex: 1024px) - 3 por linha */
+@media (max-width: 1024px) {
+    .services-grid {
+        /* 4 Colunas: 4 por linha */
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
     }
 }
 
+/* Tablet e Telemóvel Paisagem */
+@media (max-width: 768px) {
+    .services-grid {
+        /* 2 Colunas: 2 por linha */
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+/* Telemóvel (ex: 576px) - 1 por linha para máxima legibilidade */
+@media (max-width: 576px) {
+    .services-grid {
+        /* 1 Coluna: 1 por linha */
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
 /* --- Estilos para a Seção de Contactos no index.html --- */
 
 .section-contactos {
@@ -481,10 +563,22 @@ h1, h2, h3 {
 
 .contact-info-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     margin-top: 40px;
 }
+@media (max-width: 900px) {
+    .contact-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .contact-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 
 .contact-card {
     background-color: #fff;

@@ -16,7 +16,10 @@ com/brisapets/webapp/repository/AppointmentRepository.class
 com/brisapets/webapp/service/AppointmentService.class
 com/brisapets/webapp/service/UserServiceImpl.class
 com/brisapets/webapp/controller/AdminController.class
+com/brisapets/webapp/service/CalendarService.class
 com/brisapets/webapp/model/Pet.class
+com/brisapets/webapp/service/ReportService.class
+com/brisapets/webapp/service/PricingService.class
 com/brisapets/webapp/controller/UserRegistrationController.class
 com/brisapets/webapp/BrisaPetsApplication.class
 com/brisapets/webapp/dto/UserPasswordUpdateDto.class

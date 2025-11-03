@@ -13,17 +13,29 @@
 <body>
 <header class="header">
     <div class="logo-container">
-        <i class="fas fa-heart logo-icon"></i>
+        <i class="fas fa-heart logo-icon" aria-hidden="true"></i>
         <span class="logo-name">Brisa Pets</span>
         <span class="logo-slogan">Cuidados com amor</span>
+
+        <!-- Toggle (hamburger) - visível apenas em mobile -->
+        <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
     </div>
-    <nav class="nav-menu">
+
+    <!-- Nav com links (sem o Entrar dentro) -->
+    <nav class="nav-menu" id="main-nav" role="navigation" aria-label="Menu principal">
         <a href="#servicos">Serviços</a>
         <a href="#quemsomos">Quem Somos</a>
         <a href="#contactos">Contactos</a>
-        <a href="/entrar" class="btn btn-primary">Entrar</a>
     </nav>
+
+    <!-- Botão Entrar separado para mantê-lo visível no header -->
+    <a href="/entrar" class="btn btn-primary btn-header" id="btn-entrar">Entrar</a>
 </header>
+
 
 <section class="hero-section">
     <div class="hero-content">
@@ -197,5 +209,6 @@
 <footer class="footer">
     <p>© 2025 Brisa Pets. Todos os direitos reservados.</p>
 </footer>
+<script src="js/script.js"></script>
 </body>
 </html>

@@ -83,45 +83,6 @@
 
     </div>
 </div>
-
-<script>
-    const tabEntrar = document.getElementById('tab-entrar');
-    const tabRegistro = document.getElementById('tab-registro');
-    const formLogin = document.getElementById('login-form');
-    const formRegistro = document.getElementById('registro-form');
-
-    // Inicializa o estado baseado no URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const isRegistering = urlParams.has('register') || urlParams.has('error') || (formRegistro && formRegistro.querySelector('.text-danger'));
-
-    if (isRegistering) {
-        // Se houver erro de validação ou se veio do registo, mostra a aba de registo
-        tabRegistro.classList.add('active');
-        tabEntrar.classList.remove('active');
-        formRegistro.classList.remove('hidden');
-        formLogin.classList.add('hidden');
-    } else {
-        // Padrão: mostra a aba de login
-        tabEntrar.classList.add('active');
-        tabRegistro.classList.remove('active');
-        formLogin.classList.remove('hidden');
-        formRegistro.classList.add('hidden');
-    }
-
-    // Eventos de clique nas abas
-    tabEntrar.addEventListener('click', () => {
-        tabEntrar.classList.add('active');
-        tabRegistro.classList.remove('active');
-        formLogin.classList.remove('hidden');
-        formRegistro.classList.add('hidden');
-    });
-
-    tabRegistro.addEventListener('click', () => {
-        tabRegistro.classList.add('active');
-        tabEntrar.classList.remove('active');
-        formRegistro.classList.remove('hidden');
-        formLogin.classList.add('hidden');
-    });
-</script>
+<script src="/js/auth.js"></script>
 </body>
 </html>

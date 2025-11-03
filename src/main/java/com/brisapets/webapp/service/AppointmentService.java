@@ -5,6 +5,7 @@ import com.brisapets.webapp.repository.AppointmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,4 +33,13 @@ public class AppointmentService {
     public List<Appointment> findAppointmentsByTutor(Long tutorId) {
         return appointmentRepository.findByPet_TutorId(tutorId);
     }
+    public boolean isTimeSlotAvailable(LocalDateTime appointmentDateTime) {
+         appointmentRepository.findByAppointmentDateTime(appointmentDateTime).isEmpty();
+
+        List<Appointment> existingAppointments = appointmentRepository.findByAppointmentDateTime(appointmentDateTime);
+
+        // Retorna 'true' se a lista for vazia (ou seja, se o horário estiver livre)
+        return existingAppointments.isEmpty();
+    }
+
   }

@@ -20,6 +20,9 @@
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/repository/RoleRepository.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/repository/UserRepository.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/service/AppointmentService.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/service/CalendarService.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/service/PetService.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/service/PricingService.java
+/home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/service/ReportService.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/service/UserService.java
 /home/user/WorkSpace/BrisaPetsWebApp/src/main/java/com/brisapets/webapp/service/UserServiceImpl.java

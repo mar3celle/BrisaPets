@@ -7,6 +7,7 @@ import com.brisapets.webapp.dto.UserRegistrationDto;
 import com.brisapets.webapp.model.Appointment;
 import com.brisapets.webapp.model.User;
 import com.brisapets.webapp.service.AppointmentService;
+import com.brisapets.webapp.service.ReportService;
 import com.brisapets.webapp.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;

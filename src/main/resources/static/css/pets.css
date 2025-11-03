@@ -1,8 +1,9 @@
 
 /* Estilos para o Grid de Pets */
 .pets-grid {
+    /* Permite até 4 colunas de min. 250px */
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 4 cards por linha */
     gap: 30px;
     margin-top: 30px;
 }
@@ -98,11 +99,15 @@
 
 /* Estilos para o formulário de adição (Aparece no modal ou seção dedicada) */
 .add-pet-container {
-    background-color: #f8f8f8;
+    background-color: #ffffff; /* Fundo branco como os outros cards */
     border-radius: 15px;
-    padding: 30px;
-    margin-bottom: 40px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+    padding: 25px; /* Padding ajustado para o card */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Remover margens que o tiram do fluxo do grid, se houver: */
+    margin-bottom: 0;
 }
 
 .form-group {
@@ -117,21 +122,27 @@
 }
 
 .add-pet-container input[type="text"],
-.add-pet-container input[type="number"] {
+.add-pet-container input[type="number"],
+.add-pet-container select {
     width: 100%;
     padding: 12px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     font-size: 1rem;
     box-sizing: border-box;
-    transition: border-color 0.2s;
 }
-
-.add-pet-container input:focus {
-    border-color: #f48fb1;
-    outline: none;
+.add-pet-container .btn-primary {
+    /* Adapte este estilo ao seu btn-primary global */
+    background-color: var(--color-primary);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 15px; /* Espaço do topo */
 }
-
 .checkbox-group {
     display: flex;
     align-items: center;

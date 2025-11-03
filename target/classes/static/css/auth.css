@@ -10,8 +10,10 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    font-family: 'Inter', sans-serif;
 }
 
+/* Container principal */
 .login-container {
     width: 100%;
     max-width: 450px;
@@ -19,8 +21,9 @@
     text-align: center;
 }
 
-/* Cabeçalho (Seta de Volta e Logo)
-*/
+/* ---------------------------------------------------------
+   Cabeçalho (Seta de Volta e Logo)
+   --------------------------------------------------------- */
 .auth-header {
     display: flex;
     align-items: center;
@@ -33,7 +36,12 @@
     position: absolute;
     left: 0;
     font-size: 1.5em;
-    color: var(--color-text-dark);
+    color: #333;
+    transition: color 0.3s;
+}
+
+.back-link:hover {
+    color: var(--color-primary);
 }
 
 .logo-auth {
@@ -49,13 +57,16 @@
     font-size: 1.3em;
 }
 
-/* Cartão Principal
-*/
+/* ---------------------------------------------------------
+   Cartão Principal
+   --------------------------------------------------------- */
 .auth-card {
     background-color: var(--color-white);
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .auth-title {
@@ -70,11 +81,12 @@
     margin-bottom: 30px;
 }
 
-/* Abas de Navegação (Entrar / Criar Conta)
-*/
+/* ---------------------------------------------------------
+   Abas de Navegação (Entrar / Criar Conta)
+   --------------------------------------------------------- */
 .tab-navigation {
     display: flex;
-    background-color: var(--color-background-light); /* Fundo da barra de abas */
+    background-color: var(--color-background-light);
     border-radius: 10px;
     margin-bottom: 30px;
     padding: 5px;
@@ -95,54 +107,112 @@
 .tab-btn.active {
     background-color: var(--color-white);
     color: var(--color-primary);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Sombra para destacar a aba ativa */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-
-/* Formulário e Campos
-*/
+/* ---------------------------------------------------------
+   Formulário e Campos
+   --------------------------------------------------------- */
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
     text-align: left;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .auth-form label {
-    font-size: 0.9em;
+    display: block;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--color-text-dark);
-    margin-bottom: -5px;
+    margin-bottom: 8px;
 }
 
-.input-light-blue {
-    padding: 15px;
-    border: none;
+/* Inputs */
+.input-light-blue,
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form input[type="text"] {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
     border-radius: 10px;
-    background-color: #e6f0ff; /* Cor azul claro sutil do input */
+    border: 1px solid #e9eef6;
+    background-color: #f0f6ff;
     color: var(--color-text-dark);
-    font-size: 1em;
+    font-size: 1rem;
+    outline: none;
+    margin-bottom: 14px;
+    transition: box-shadow 0.18s, border-color 0.18s, background 0.18s;
 }
 
+/* Foco */
+.input-light-blue:focus,
+.auth-form input:focus {
+    border-color: rgba(254, 135, 160, 0.9);
+    box-shadow: 0 8px 24px rgba(254, 135, 160, 0.10);
+    background: #fff;
+}
+
+/* Autofill (remove fundo azul do Chrome) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-text-dark) !important;
+    -webkit-box-shadow: 0 0 0px 1000px #f0f6ff inset !important;
+    box-shadow: 0 0 0px 1000px #f0f6ff inset !important;
+}
+
+/* Botão principal */
 .btn-submit {
-    /* Usa a cor rosa principal, mas com um padding maior */
     background-color: var(--color-primary);
     color: var(--color-white);
-    padding: 15px 25px;
-    margin-top: 15px;
+    padding: 14px 22px;
+    margin-top: 12px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    display: inline-block;
+    width: 220px;
+    max-width: 100%;
+    text-align: center;
+    transition: background-color 0.3s;
 }
 
 .btn-submit:hover {
     background-color: #e06e86;
 }
 
+/* Mensagens Thymeleaf */
+.text-danger,
+.alert-error,
+.alert-success {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+}
+
+/* Esconde formulário inativo */
 .hidden {
     display: none;
 }
 
-/* Responsividade */
+/* ---------------------------------------------------------
+   Responsividade
+   --------------------------------------------------------- */
 @media (max-width: 500px) {
     .auth-card {
-        padding: 30px 20px;
+        padding: 28px 18px;
     }
-}
+
+    .btn-submit {
+        width: 100%;
+    }
+
+    .tab-navigation {
+        flex-direction:
