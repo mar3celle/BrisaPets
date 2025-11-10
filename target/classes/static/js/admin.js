@@ -1,490 +1,193 @@
-// --- ESTADO GLOBAL ---
-let currentPage = 'dashboard';
-let currentYearMonth = new Date();
-let selectedDate = null;
-let chartInstance = null;
+document.addEventListener('DOMContentLoaded', () => {
 
-// Data should be fetched from backend APIs instead of hardcoded mock data
-// TODO: Replace with actual API calls to backend services
 
-// --- FUNÇÕES DE NAVEGAÇÃO E RENDERIZAÇÃO ---
 
-function navigate(page) {
-    currentPage = page;
-    renderPage();
 
-    // Atualiza o estado visual do menu
-    document.querySelectorAll('.sidebar-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    const navId = page === 'appointment_form' ? 'nav-dashboard' : `nav-${page}`;
-    const activeNav = document.getElementById(navId);
-    if (activeNav) {
-        activeNav.classList.add('active');
-    }
 
-    // Esconde o menu em mobile após a navegação
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar && sidebar.classList.contains('active')) {
-        sidebar.classList.remove('active');
-    }
-}
+    // --- FUNÇÕES DO DASHBOARD (renderCharts e initDashboard) ---
 
-function renderPage() {
-    const mainContent = document.getElementById('main-content');
-    let templateId;
-    let title;
+    function renderCharts(data) {
+        const ctx = document.getElementById('myChart');
 
-    switch (currentPage) {
-        case 'dashboard':
-            templateId = 'dashboard-template';
-            title = 'Dashboard';
-            break;
-        case 'reports':
-            templateId = 'reports-template';
-            title = 'Relatórios de Serviços';
-            break;
-        case 'sitting':
-            templateId = 'sitting-template';
-            title = 'Diário Pet Sitting';
-            break;
-        case 'appointment_form':
-            templateId = 'appointment-form-template';
-            title = 'Adicionar Agendamento';
-            break;
-        case 'clients':
-            templateId = 'clients-template';
-            title = 'Clientes e Pets';
-            break;
-        default:
-            templateId = 'dashboard-template';
-            title = 'Dashboard';
-    }
-
-    // Define o título da página
-    const pageTitleEl = document.getElementById('page-title');
-    if (pageTitleEl) pageTitleEl.textContent = title;
-
-    // Clona o template e renderiza
-    const template = document.getElementById(templateId);
-    if (template) {
-        mainContent.innerHTML = '';
-        const content = template.content.cloneNode(true);
-        mainContent.appendChild(content);
-
-        // Chama funções de inicialização específicas
-        if (currentPage === 'dashboard') {
-            initDashboard();
-        } else if (currentPage === 'reports') {
-            initReports();
-        } else if (currentPage === 'sitting') {
-            initSitting();
-        } else if (currentPage === 'appointment_form') {
-            initAppointmentForm();
-        } else if (currentPage === 'clients') {
-            initClients();
+        // Destruir a instância anterior do gráfico, se existir
+        if (chartInstance) {
+            chartInstance.destroy();
         }
-    }
-}
 
-// --- LÓGICA ESPECÍFICA DAS PÁGINAS ---
-
-// ########################### 1. DASHBOARD ###########################
-function initDashboard() {
-    renderAppointments();
-    renderStats();
-    createServicesChart();
-}
-
-function renderAppointments() {
-    const list = document.getElementById('appointment-list');
-    if (!list) return;
-    list.innerHTML = '';
-
-    const today = new Date().toISOString().split('T')[0];
-
-    // Filtra agendamentos de hoje/futuro e ordena
-    const upcoming = mockAppointments
-        .filter(a => a.date >= today)
-        .sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
-
-    if (upcoming.length === 0) {
-         list.innerHTML = `<p class="text-muted italic p-4 card">Sem agendamentos futuros registados.</p>`;
-         return;
-    }
-
-    upcoming.forEach(appt => {
-        const isNew = appt.status === 'Novo';
-        const badgeClass = isNew ? 'badge-new' : 'badge-confirmed';
-        const badgeText = appt.status;
-
-        const item = document.createElement('div');
-        item.className = 'appointment-item';
-        item.innerHTML = `
-            <div class="left">
-                <div class="title">${appt.time} - ${appt.pet} (<span style="font-weight:600;color:var(--color-primary)">${appt.tutor}</span>)</div>
-                <div class="meta">${appt.service} | ${new Date(appt.date).toLocaleDateString('pt-PT', {day: '2-digit', month: 'short'})}</div>
-            </div>
-            <div class="right" style="display:flex;align-items:center;gap:0.75rem">
-                <span class="badge ${badgeClass}">${badgeText}</span>
-                ${isNew ? `<button onclick="confirmAppointment(${appt.id})" class="btn-confirm">Confirmar</button>` : ''}
-            </div>
-        `;
-        list.appendChild(item);
-    });
-}
-
-function confirmAppointment(id) {
-    // Should make API call to backend to confirm appointment
-    fetch(`/api/appointments/${id}/confirm`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                renderAppointments();
-                showNotification('Agendamento confirmado com sucesso!');
-            }
-        })
-        .catch(error => console.error('Error confirming appointment:', error));
-}
-
-function renderStats() {
-    const statAppointments = document.getElementById('stat-appointments');
-    const statRevenue = document.getElementById('stat-revenue');
-    const statSitting = document.getElementById('stat-sitting-revenue');
-
-    if (statAppointments) statAppointments.textContent = mockStats.totalAppointments;
-    if (statRevenue) statRevenue.textContent = `€ ${mockStats.totalRevenue.toFixed(2)}`;
-    if (statSitting) statSitting.textContent = `€ ${mockStats.sittingRevenue.toFixed(2)}`;
-}
-
-function createServicesChart() {
-    if (chartInstance) {
-        chartInstance.destroy();
-    }
-
-    const ctx = document.getElementById('servicesChart');
-    if (!ctx) return;
-
-    const data = mockStats.servicesUsage;
-    const labels = Object.keys(data);
-    const values = Object.values(data);
-
-    chartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: values,
-                backgroundColor: [
-                    '#fe87a0', // primary
-                    '#ffb1c3', // secondary
-                    '#a0d8ff',
-                    '#f7a379'
-                ],
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+                datasets: [{
+                    label: 'Serviços Diários',
+                    data: data.dailyServices,
+                    backgroundColor: 'rgba(254, 135, 160, 0.7)', // Cor primária do tema
+                    borderColor: 'rgba(254, 135, 160, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 },
-                title: {
-                    display: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Serviços Agendados na Última Semana'
+                    }
                 }
             }
+        });
+    }
+
+    async function initDashboard() {
+        const data = await fetchData('dashboard');
+
+        // 1. Atualizar métricas (se os elementos HTML existirem)
+        const metricUsers = document.getElementById('metric-users');
+        if (metricUsers) metricUsers.textContent = data.users.toLocaleString('pt-PT');
+
+        const metricAppointments = document.getElementById('metric-appointments');
+        if (metricAppointments) metricAppointments.textContent = data.appointments.toLocaleString('pt-PT');
+
+        const metricRevenue = document.getElementById('metric-revenue');
+        if (metricRevenue) metricRevenue.textContent = `€ ${data.revenue.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+
+        // 2. Renderizar Gráfico
+        if (document.getElementById('myChart')) {
+            renderCharts(data);
         }
-    });
-}
-
-// ########################### 2. RELATÓRIOS ###########################
-function initReports() {
-    const tableBody = document.getElementById('reports-table-body');
-    if (!tableBody) return;
-    tableBody.innerHTML = '';
-
-    mockReports.forEach(report => {
-        const row = document.createElement('tr');
-        const statusColor = report.status === 'Concluído' ? 'text-green-600' : 'text-gray-500';
-
-        row.innerHTML = `
-            <td class="py-3 px-4 text-sm">${new Date(report.date).toLocaleDateString('pt-PT')}</td>
-            <td class="py-3 px-4 text-sm">${report.service}</td>
-            <td class="py-3 px-4 text-sm font-medium">${report.pet}</td>
-            <td class="py-3 px-4 text-sm">${report.tutor}</td>
-            <td class="py-3 px-4 text-right text-sm font-semibold text-gray-700">€ ${report.value.toFixed(2)}</td>
-            <td class="py-3 px-4 text-center text-sm ${statusColor}">${report.status}</td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
-
-// ########################### 3. PET SITTING DIARY ###########################
-function initSitting() {
-    const filter = document.getElementById('sitting-filter');
-    renderSittingSessions(filter ? filter.value : 'ativo');
-    if (filter) {
-        filter.addEventListener('change', (e) => {
-            renderSittingSessions(e.target.value);
-        });
-    }
-}
-
-function renderSittingSessions(filter) {
-    const list = document.getElementById('sitting-sessions-list');
-    if (!list) return;
-    list.innerHTML = '';
-
-    const filteredSessions = mockSittings.filter(s => filter === 'all' || s.status.toLowerCase() === filter.toLowerCase());
-
-    if (filteredSessions.length === 0) {
-        list.innerHTML = `<p class="text-muted italic p-4 card">Nenhuma sessão ${filter} encontrada.</p>`;
-        return;
     }
 
-    filteredSessions.forEach(session => {
-        const isExpired = session.status === 'Expirado';
-        const statusClass = isExpired ? 'bg-gray-200 text-gray-700' : 'bg-green-100 text-green-700';
 
-        const sessionElement = document.createElement('div');
-        sessionElement.className = 'card p-4 border border-gray-100';
-        sessionElement.innerHTML = `
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-3">
-                <div>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full ${statusClass}">${session.status}</span>
-                    <h3 class="text-xl font-bold text-gray-800 mt-1">${session.pet} (<span class="font-normal" style="color:var(--color-primary)">${session.tutor}</span>)</h3>
-                    <p class="text-sm text-muted"><i class="fas fa-calendar-alt mr-1"></i> Período: ${session.period}</p>
-                </div>
-                <div class="text-sm font-medium mt-3 sm:mt-0">${session.photoCount} Fotos</div>
-            </div>
+    // --- FUNÇÕES DO CALENDÁRIO (Appointments/Sitting) ---
 
-            <div class="gallery-grid mb-4" id="gallery-${session.id}">
-            </div>
+    // Polyfill simples para YearMonth (para simular a funcionalidade de um objeto real)
+    function YearMonth(year, month) {
+        this.date = new Date(year, month - 1, 1);
+        this.year = this.date.getFullYear();
+        this.month = this.date.getMonth() + 1; // 1-12
 
-            <button onclick="deletePhotos(${session.id})" class="btn" style="background:#ef4444;color:#fff">
-                <i class="fas fa-trash-alt mr-2"></i> Excluir Fotos Anteriores
-            </button>
-        `;
-        list.appendChild(sessionElement);
-
-        const gallery = sessionElement.querySelector(`#gallery-${session.id}`);
-        session.photos.forEach(photoName => {
-             const img = document.createElement('img');
-             img.src = 'https://placehold.co/300x200/ffb1c3/333?text=Foto';
-             img.alt = 'Foto do Pet';
-             img.style.borderRadius = '8px';
-             gallery.appendChild(img);
-        });
-    });
-}
-
-function deletePhotos(sessionId) {
-    // Lógica para excluir as fotos (apenas mock aqui)
-    alert(`Atenção: A função para excluir as fotos da sessão ${sessionId} foi acionada. (Implementação real de back-end necessária)`);
-}
-
-// ########################### 4. AGENDAR / ADICIONAR AGENDAMENTO ###########################
-function initAppointmentForm() {
-    renderCalendar();
-    const serviceType = document.getElementById('service-type');
-    const form = document.getElementById('appointment-details-form');
-    if (serviceType) serviceType.addEventListener('change', toggleServiceType);
-    if (form) form.addEventListener('submit', handleAppointmentSubmit);
-
-    // se houver wrapper de busca, ativar event listeners
-    const petSearch = document.getElementById('pet-search');
-    const resultsDiv = document.getElementById('search-results');
-    if (petSearch && resultsDiv) {
-        petSearch.addEventListener('input', searchClient);
-    }
-}
-
-function toggleServiceType(event) {
-    const type = event.target.value;
-    const timeSlot = document.getElementById('time-slot-container');
-    const period = document.getElementById('period-container');
-    if (timeSlot) timeSlot.classList.toggle('hidden', type === 'sitting');
-    if (period) period.classList.toggle('hidden', type !== 'sitting');
-}
-
-function renderCalendar() {
-    const today = new Date();
-    const year = currentYearMonth.getFullYear();
-    const month = currentYearMonth.getMonth(); // 0-11
-    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-
-    const titleEl = document.getElementById('calendar-title');
-    if (titleEl) titleEl.textContent = `${monthNames[month]} ${year}`;
-    const calendarGrid = document.getElementById('calendar-grid');
-    if (!calendarGrid) return;
-    // remove only day elements (safer)
-    calendarGrid.querySelectorAll('.day').forEach(d => d.remove());
-
-    const firstDayOfMonth = new Date(year, month, 1);
-    const lastDayOfMonth = new Date(year, month + 1, 0);
-
-    // Padding (0=Dom, 1=Seg, ... 6=Sáb)
-    let padding = firstDayOfMonth.getDay();
-
-    // Adiciona espaços vazios
-    for (let i = 0; i < padding; i++) {
-        const empty = document.createElement('div');
-        empty.className = 'calendar-day-box day day-disabled';
-        calendarGrid.appendChild(empty);
+        this.toLocaleString = function(locale, options) {
+            return this.date.toLocaleString(locale, options);
+        };
+        this.lengthOfMonth = function() {
+            return new Date(this.year, this.month, 0).getDate();
+        };
+        this.atDay = function(day) {
+            // Retorna um objeto com getDay() que simula LocalDate.getDayOfWeek().getValue() de 0 (Dom) a 6 (Sáb)
+            return { getDay: () => new Date(this.year, this.month - 1, day).getDay() };
+        };
+        this.plusMonths = function(months) {
+            const newDate = new Date(this.date);
+            newDate.setMonth(newDate.getMonth() + months);
+            return new YearMonth(newDate.getFullYear(), newDate.getMonth() + 1);
+        };
+        this.minusMonths = function(months) {
+            return this.plusMonths(-months);
+        };
     }
 
-    // Adiciona dias
-    for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
-        const date = new Date(year, month, day);
-        const dateString = date.toISOString().split('T')[0];
-        const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const isSelected = selectedDate === dateString;
+    // Corrigir a inicialização do estado global para usar o YearMonth "polyfill"
+    currentYearMonth = new YearMonth(currentYearMonth.getFullYear(), currentYearMonth.getMonth() + 1);
 
-        let classes = 'calendar-day-box day text-lg font-medium';
-        if (isPast) classes += ' day-disabled';
-        if (isSelected) classes += ' day-selected';
 
-        const newDayDiv = document.createElement('div');
-        newDayDiv.className = classes;
-        newDayDiv.dataset.date = dateString;
-        newDayDiv.textContent = day;
+    function initCalendar() {
+        // Inicializa o calendário com o mês atual
+        renderCalendar(currentYearMonth);
+    }
 
-        if (!isPast) {
-            newDayDiv.onclick = () => selectDay(dateString);
+    function renderCalendar(yearMonth) {
+        // Atualiza o estado global
+        currentYearMonth = yearMonth;
+
+        const calendarElement = document.getElementById('calendar-grid');
+        const monthYearDisplay = document.getElementById('month-year-display');
+
+        if (!calendarElement || !monthYearDisplay) {
+            return; // Sai se os elementos não existirem na página atual
         }
-        calendarGrid.appendChild(newDayDiv);
-    }
-}
 
-function changeMonth(delta) {
-    currentYearMonth.setMonth(currentYearMonth.getMonth() + delta);
-    renderCalendar();
-}
+        // Formato do mês: "Novembro 2025"
+        monthYearDisplay.textContent = yearMonth.toLocaleString('pt-PT', { month: 'long', year: 'numeric' });
 
-function selectDay(dateString) {
-    selectedDate = dateString;
+        // Calcula os dias do calendário (simulação simples)
+        const daysInMonth = yearMonth.lengthOfMonth();
+        const firstDayOfMonth = yearMonth.atDay(1).getDay(); // 0 (Dom) a 6 (Sáb)
 
-    // Remove seleção anterior
-    document.querySelectorAll('.day-selected').forEach(d => d.classList.remove('day-selected'));
+        // Limpa o calendário anterior
+        calendarElement.innerHTML = '';
 
-    // Adiciona nova seleção
-    const selectedElement = document.querySelector(`.day[data-date="${dateString}"]`);
-    if (selectedElement) {
-        selectedElement.classList.add('day-selected');
-    }
+        // Adiciona células vazias para o padding (garante que 1º dia comece no dia da semana correto)
+        // Adjust for Monday start (0=Sun, 1=Mon... 6=Sat). We want Monday=0, Sunday=6 padding.
+        const startDay = (firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1);
 
-    const date = new Date(dateString);
-    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const selectedDisplay = document.getElementById('selected-date-display');
-    if (selectedDisplay) {
-        selectedDisplay.textContent =
-            `Data Selecionada: ${date.toLocaleDateString('pt-PT', dateOptions)}`;
-    }
-}
+        for (let i = 0; i < startDay; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.classList.add('calendar-day-box', 'empty');
+            calendarElement.appendChild(emptyDay);
+        }
 
-function searchClient() {
-    const petSearchEl = document.getElementById('pet-search');
-    const resultsDiv = document.getElementById('search-results');
-    if (!petSearchEl || !resultsDiv) return;
+        // Adiciona as células do dia
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayElement = document.createElement('div');
+            dayElement.classList.add('calendar-day-box');
+            dayElement.innerHTML = `<div class="day-number">${day}</div><div class="appointment-list"></div>`;
 
-    const query = petSearchEl.value.trim().toLowerCase();
-    resultsDiv.innerHTML = '';
+            // Simulação: Adiciona um evento em alguns dias para demonstração
+            if (day % 5 === 0) {
+                 const list = dayElement.querySelector('.appointment-list');
+                 list.innerHTML += `<div class="appointment-item bg-primary-light">Banho - Tobby</div>`;
+            }
+            if (day % 7 === 1) {
+                 const list = dayElement.querySelector('.appointment-list');
+                 list.innerHTML += `<div class="appointment-item bg-secondary-light">Pet Sit - Kiko</div>`;
+            }
 
-    if (query.length < 2) {
-        resultsDiv.classList.remove('show');
-        return;
-    }
 
-    const results = mockUsers.filter(user =>
-        user.name.toLowerCase().includes(query) ||
-        user.pets.some(pet => pet.toLowerCase().includes(query))
-    );
-
-    if (results.length > 0) {
-        resultsDiv.classList.add('show');
-        results.forEach(user => {
-            const resultItem = document.createElement('div');
-            resultItem.className = 'p-2 border-b cursor-pointer hover:bg-gray-100 text-sm';
-            resultItem.textContent = `${user.name} (Pets: ${user.pets.join(', ')})`;
-            resultItem.onclick = () => selectClient(user);
-            resultsDiv.appendChild(resultItem);
-        });
-    } else {
-         resultsDiv.classList.add('show');
-         resultsDiv.innerHTML = `<div class="p-2 text-sm text-muted italic">Nenhum cliente/pet encontrado.</div>`;
-    }
-}
-
-function selectClient(user) {
-    const petSearchEl = document.getElementById('pet-search');
-    const resultsDiv = document.getElementById('search-results');
-    if (petSearchEl) petSearchEl.value = user.name;
-    if (resultsDiv) resultsDiv.classList.remove('show');
-    // Aqui você poderia pré-preencher outros campos se necessário
-    alert(`Cliente selecionado: ${user.name}.`);
-}
-
-function handleAppointmentSubmit(event) {
-    event.preventDefault();
-
-    if (!selectedDate) {
-         alert('Por favor, selecione uma data no calendário.');
-         return;
+            calendarElement.appendChild(dayElement);
+        }
     }
 
-    const petSearch = document.getElementById('pet-search') ? document.getElementById('pet-search').value : '';
-    const serviceType = document.getElementById('service-type') ? document.getElementById('service-type').value : 'banho';
+    function nextMonth() {
+        const nextMonthYear = currentYearMonth.plusMonths(1);
+        renderCalendar(nextMonthYear);
+    }
 
-    // Mock de submissão
-    alert(`Agendamento Criado!\nTipo: ${serviceType === 'banho' ? 'Banho/Tosquia' : 'Pet Sitting'}\nData: ${selectedDate}\nCliente: ${petSearch}`);
+    function prevMonth() {
+        const prevMonthYear = currentYearMonth.minusMonths(1);
+        renderCalendar(prevMonthYear);
+    }
 
-    // Navega de volta ao dashboard
-    navigate('dashboard');
-}
+    // --- INICIALIZAÇÃO DE LISTENERS ---
 
-// ########################### 5. CLIENTES E PETS ###########################
-function initClients() {
-    const tableBody = document.getElementById('clients-table-body');
-    if (!tableBody) return;
-    tableBody.innerHTML = '';
 
-    mockUsers.forEach(user => {
-        const row = document.createElement('tr');
-        row.className = 'border-b hover:bg-gray-50';
-        row.innerHTML = `
-            <td class="py-3 px-4 text-sm font-medium">${user.name}</td>
-            <td class="py-3 px-4 text-sm">${user.email}</td>
-            <td class="py-3 px-4 text-sm">${user.phone}</td>
-            <td class="py-3 px-4 text-sm">${user.pets.join(', ')}</td>
-            <td class="py-3 px-4 text-center text-sm">
-                <button class="text-blue-500 hover:text-blue-700 mx-1"><i class="fas fa-edit"></i></button>
-                <button class="text-red-500 hover:text-red-700 mx-1"><i class="fas fa-trash"></i></button>
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
 
-// --- INICIALIZAÇÃO E EVENT LISTENERS GERAIS ---
-document.addEventListener('DOMContentLoaded', () => {
-    // Inicializa a primeira página
-    navigate('dashboard');
 
-    // Toggle do menu mobile (robusto: verifica elementos)
-    const menuToggle = document.getElementById('menu-toggle');
+    // -------------------------------------------------------------------------
+    // --- LÓGICA DE UI GERAL (Sidebar Toggle, Margin, Search Dropdown) ---
+    // -------------------------------------------------------------------------
+
+    // Toggle do menu em mobile/tablet
+    const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebar');
-    if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', () => {
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', () => {
             sidebar.classList.toggle('active');
         });
     }
 
     // Ajusta margem do conteúdo principal conforme largura
-    const mainWrapper = document.querySelector('.flex-1') || document.querySelector('.main-wrapper') || document.getElementById('main-content').parentElement;
+    const mainWrapper = document.querySelector('.flex-1') || document.querySelector('.main-wrapper') || document.getElementById('main-content')?.parentElement;
     function adjustMainMargin(){
         if (!mainWrapper) return;
+        // Se a sidebar estiver visível na desktop (>= 1024px), adiciona a margem
         if(window.innerWidth >= 1024){
             mainWrapper.style.marginLeft = '280px';
         } else {
@@ -498,20 +201,136 @@ document.addEventListener('DOMContentLoaded', () => {
     const petSearch = document.getElementById('pet-search');
     const resultsDiv = document.getElementById('search-results');
     if (resultsDiv && petSearch) {
+        // Inicializa o dropdown com display: none (será controlado pelo observer/classe 'show')
+        resultsDiv.style.display = 'none';
+
+        // Observador para verificar se há resultados e mostrar/esconder o dropdown
         const observer = new MutationObserver(() => {
-            if(resultsDiv.children.length && petSearch.value.trim().length >= 2){
+            // Verifica se há elementos filhos DENTRO do resultsDiv E se o input tem pelo menos 2 caracteres
+            if(resultsDiv.children.length > 0 && petSearch.value.trim().length >= 2){
                 resultsDiv.classList.add('show');
+                resultsDiv.style.display = 'block';
             } else {
                 resultsDiv.classList.remove('show');
+                resultsDiv.style.display = 'none';
             }
         });
         observer.observe(resultsDiv, { childList: true, subtree: true });
 
         // Fechar dropdown quando clicam fora
         document.addEventListener('click', (e) => {
+            // Se o clique não foi dentro da div de resultados E não foi no input de pesquisa
             if (!resultsDiv.contains(e.target) && e.target !== petSearch) {
                 resultsDiv.classList.remove('show');
+                resultsDiv.style.display = 'none';
+            }
+        });
+
+        // Adiciona um listener para o input para simular a pesquisa
+        petSearch.addEventListener('input', async (e) => {
+            const query = e.target.value.trim();
+            resultsDiv.innerHTML = ''; // Limpa resultados
+
+            if (query.length >= 2) {
+                // Simulação de pesquisa de pets
+                // TODO: Chamar API real para pesquisa
+                const pets = [
+                    { id: 1, name: 'Tobby' },
+                    { id: 2, name: 'Max' },
+                    { id: 3, name: 'Kiko' }
+                ];
+
+                const filteredPets = pets.filter(pet =>
+                    pet.name.toLowerCase().includes(query.toLowerCase())
+                );
+
+                filteredPets.forEach(pet => {
+                    const resultItem = document.createElement('a');
+                    resultItem.href = `/admin/pets/${pet.id}`;
+                    resultItem.classList.add('search-result-item', 'p-3', 'hover:bg-gray-50', 'block');
+                    resultItem.textContent = pet.name;
+                    resultsDiv.appendChild(resultItem);
+                });
             }
         });
     }
+
+
+    // -------------------------------------------------------------------------
+    // --- FUNÇÃO DE ALERTA (Para mensagens flash do servidor) ---
+    // -------------------------------------------------------------------------
+
+    /**
+     * Exibe uma mensagem de alerta temporária no topo do dashboard.
+     */
+    function alertMessage(msg, type) {
+        const container = document.querySelector('.dashboard-container') || document.querySelector('.main-content-wrapper');
+        if (!container) return;
+
+        let messageBox = document.querySelector('#js-admin-alert');
+        if (!messageBox) {
+            messageBox = document.createElement('div');
+            messageBox.id = 'js-admin-alert';
+            messageBox.style.cssText = `
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 8px;
+                font-weight: 600;
+                display: none;
+                text-align: center;
+                transition: opacity 0.3s;
+                opacity: 0;
+            `;
+            // Tenta adicionar logo abaixo do cabeçalho principal
+            const contentArea = document.getElementById('main-content');
+            if(contentArea && contentArea.parentElement) {
+                 contentArea.parentElement.insertBefore(messageBox, contentArea);
+            } else {
+                 container.prepend(messageBox);
+            }
+        }
+
+        messageBox.textContent = msg;
+        messageBox.style.opacity = 0;
+        messageBox.style.display = 'block';
+
+        if (type === 'success') {
+            messageBox.style.backgroundColor = '#d4edda';
+            messageBox.style.color = '#155724';
+            messageBox.style.border = '1px solid #c3e6cb';
+        } else if (type === 'error') {
+            messageBox.style.backgroundColor = '#f8d7da';
+            messageBox.style.color = '#721c24';
+            messageBox.style.border = '1px solid #f5c6cb';
+        } else { // info ou default
+             messageBox.style.backgroundColor = '#cce5ff';
+             messageBox.style.color = '#004085';
+             messageBox.style.border = '1px solid #b8daff';
+        }
+
+        // Fade in
+        setTimeout(() => {
+            messageBox.style.opacity = 1;
+        }, 10);
+
+        // Esconde a mensagem após 4 segundos
+        setTimeout(() => {
+            messageBox.style.opacity = 0;
+            // Espera a transição acabar para esconder
+            setTimeout(() => {
+                 messageBox.style.display = 'none';
+            }, 300);
+        }, 4000);
+    }
+
+    // Processa mensagens flash
+    const adminMessageElement = document.getElementById('flash-admin-message');
+    if (adminMessageElement && adminMessageElement.value) {
+        alertMessage(adminMessageElement.value, 'success');
+    }
+    const adminErrorElement = document.getElementById('flash-admin-error');
+    if (adminErrorElement && adminErrorElement.value) {
+        alertMessage(adminErrorElement.value, 'error');
+    }
+
 });

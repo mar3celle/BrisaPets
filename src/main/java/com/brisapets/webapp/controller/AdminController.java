@@ -37,21 +37,19 @@ public class AdminController {
      * Carrega todos os dados críticos do sistema para exibição.
      */
     @GetMapping("/admin")
-    // A segurança já está definida em SecurityConfig, garantindo que apenas ADMIN acede.
     public String adminPanel(Model model) {
-        // 1. Carregar todos os Utilizadores
         List<User> users = userService.findAllUsers();
         model.addAttribute("allUsers", users);
 
-        // 2. Carregar todos os Pets
         List<Pet> pets = petService.findAllPets();
         model.addAttribute("allPets", pets);
 
-        // 3. Carregar todos os Agendamentos
         List<Appointment> appointments = appointmentService.findAllAppointments();
         model.addAttribute("allAppointments", appointments);
+        
+        model.addAttribute("currentPage", "admin");
 
-        return "admin"; // Busca o template admin.html
+        return "admin";
     }
 
     @PostMapping("/admin/user/delete/{id}")

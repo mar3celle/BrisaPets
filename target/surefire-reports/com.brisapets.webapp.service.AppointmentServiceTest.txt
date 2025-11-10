@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.brisapets.webapp.service.AppointmentServiceTest
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.803 s -- in com.brisapets.webapp.service.AppointmentServiceTest

@@ -206,6 +206,11 @@ table thead th{ background:#f3f4f6; font-weight:700; font-size:.75rem; color:#37
 .btn{ display:inline-flex; align-items:center; gap:.5rem; border-radius:8px; padding:.6rem .9rem; font-weight:700; }
 .btn-primary{ background:var(--color-primary); color:#fff; }
 
+/* Hide internal navigation on admin pages */
+.nav-menu-internal {
+  display: none;
+}
+
 /* responsive tweaks */
 @media(max-width:1023px){
   .sidebar{ transform:translateX(-110%); position:fixed; }

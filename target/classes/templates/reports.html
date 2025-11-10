@@ -10,32 +10,32 @@
 
     <!-- Links para estilos externos do projeto -->
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/reports.css">
 </head>
 <body>
 
-<!-- CABEÇALHO COM NAVEGAÇÃO INTERNA -->
-<header class="header">
-    <div class="logo-container">
-        <i class="fas fa-heart logo-icon"></i>
-        <span class="logo-name">Brisa Pets</span>
-        <span class="logo-slogan">Cuidados com amor</span>
+<aside class="sidebar" id="sidebar">
+    <div class="p-6">
+        <h1><i class="fas fa-heart"></i> Brisa Pets <span class="logo-sub">Admin</span></h1>
+        <nav>
+            <a href="/admin" class="sidebar-item" th:classappend="${currentPage == 'admin'} ? 'active' : ''" id="nav-dashboard">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="/reports" class="sidebar-item" th:classappend="${currentPage == 'reports'} ? 'active' : ''" id="nav-reports">
+                <i class="fas fa-file-alt"></i> Relatórios
+            </a>
+            <a href="/clientlist" class="sidebar-item" th:classappend="${currentPage == 'clientlist'} ? 'active' : ''" id="nav-clients">
+                <i class="fas fa-users"></i> Clientes
+            </a>
+            <a href="/adminCalendar" class="sidebar-item" th:classappend="${currentPage == 'adminCalendar'} ? 'active' : ''" id="nav-adminCalendar">
+                <i class="fas fa-calendar-alt"></i> Agendamentos
+            </a>
+        </nav>
     </div>
-    <nav class="nav-menu-internal">
-        <a href="/pets" class="nav-link-icon"><i class="fas fa-paw"></i> Meus Pets</a>
-        <a href="/agendar" class="nav-link-icon"><i class="fas fa-calendar-alt"></i> Agendar Serviço</a>
-        <a href="/appointments" class="nav-link-icon"><i class="fas fa-list-alt"></i> Meus Agendamentos</a>
-        <a href="/hospedagem" class="nav-link-icon"><i class="fas fa-home"></i> Hospedagem</a>
-        <a href="/perfil" class="nav-link-icon"><i class="fas fa-user-circle"></i> Meu Perfil</a>
-        <!-- LINK ATUAL -->
-        <a href="/reports" class="nav-link-icon current"><i class="fas fa-chart-bar"></i> Relatórios</a>
-        <a href="/logout" class="nav-link-icon"><i class="fas fa-sign-out-alt"></i> Sair</a>
-    </nav>
-</header>
+</aside>
 
-<!-- CONTEÚDO PRINCIPAL DOS RELATÓRIOS -->
-<main class="main-content">
+<div class="main-wrapper">
     <div class="dashboard-container">
 
         <div class="report-header">
@@ -150,7 +150,7 @@
         </div>
 
     </div>
-</main>
+</div>
 
 </body>
 </html>

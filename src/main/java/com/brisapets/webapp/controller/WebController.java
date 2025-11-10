@@ -72,7 +72,8 @@ public class WebController {
         model.addAttribute("totalRevenue", String.format("€ %.2f", reportService.calculateTotalRevenue()));
         model.addAttribute("totalServices", String.valueOf(reportService.getTotalServices()));
         model.addAttribute("avgTicket", String.format("€ %.2f", reportService.calculateAverageTicket()));
-        model.addAttribute("newClients", "18"); // Mock data
+        model.addAttribute("newClients", "18");
+        model.addAttribute("currentPage", "reports");
         
         return "reports";
     }
@@ -126,6 +127,12 @@ public class WebController {
     @GetMapping("/403")
     public String accessDenied() {
         return "403";
+    }
+
+    @GetMapping("/adminCalendar")
+    public String adminCalendar(Model model) {
+        model.addAttribute("currentPage", "adminCalendar");
+        return "adminCalendar";
     }
 
     @PostMapping("/perfil/deletar")

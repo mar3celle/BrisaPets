@@ -10,22 +10,26 @@
     <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
-    <div class="sidebar" id="sidebar">
-        <div class="p-6">
-            <h1><i class="fas fa-heart"></i> Brisa Pets <span class="logo-sub">Admin</span></h1>
-            <nav>
-                <div class="sidebar-item active" id="nav-dashboard" onclick="navigate('dashboard')">
-                    <i class="fas fa-chart-line"></i> Dashboard
-                </div>
-                <div class="sidebar-item" id="nav-reports" onclick="navigate('reports')">
-                    <i class="fas fa-file-alt"></i> Relatórios
-                </div>
-                <div class="sidebar-item" id="nav-clients" onclick="navigate('clients')">
-                    <i class="fas fa-users"></i> Clientes
-                </div>
-            </nav>
-        </div>
+<aside class="sidebar" id="sidebar">
+    <div class="p-6">
+        <h1><i class="fas fa-heart"></i> Brisa Pets <span class="logo-sub">Admin</span></h1>
+        <nav>
+            <a href="/admin" class="sidebar-item" th:classappend="${currentPage == 'admin'} ? 'active' : ''" id="nav-dashboard">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="/reports" class="sidebar-item" th:classappend="${currentPage == 'reports'} ? 'active' : ''" id="nav-reports">
+                <i class="fas fa-file-alt"></i> Relatórios
+            </a>
+            <a href="/clientlist" class="sidebar-item" th:classappend="${currentPage == 'clientlist'} ? 'active' : ''" id="nav-clients">
+                <i class="fas fa-users"></i> Clientes
+            </a>
+            <a href="/adminCalendar" class="sidebar-item" th:classappend="${currentPage == 'adminCalendar'} ? 'active' : ''" id="nav-adminCalendar">
+                <i class="fas fa-calendar-alt"></i> Agendamentos
+            </a>
+        </nav>
     </div>
+</aside>
+
 
     <div class="main-wrapper">
         <h1 id="page-title">Painel de Administração</h1>
