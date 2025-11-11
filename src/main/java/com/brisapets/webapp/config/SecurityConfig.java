@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/debug/**").authenticated()
 
                         // ROTA DO PAINEL ADMIN: Requer a ROLE_ADMIN (mais idiomático)
-                        .requestMatchers("/admin").hasRole("ADMIN")
+                        .requestMatchers("/admin", "/clientlist").hasRole("ADMIN")
 
                         // O resto das rotas são privadas (ex: /perfil, /pets, /appointments)
                         .anyRequest().authenticated()
