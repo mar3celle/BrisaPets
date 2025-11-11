@@ -7,20 +7,28 @@ import com.brisapets.webapp.dto.UserRegistrationDto;
 import com.brisapets.webapp.model.Appointment;
 import com.brisapets.webapp.model.User;
 import com.brisapets.webapp.service.AppointmentService;
+import com.brisapets.webapp.service.CalendarService;
+import com.brisapets.webapp.service.PetService;
 import com.brisapets.webapp.service.ReportService;
 import com.brisapets.webapp.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class WebController {
@@ -28,11 +36,15 @@ public class WebController {
     private final UserService userService;
     private final AppointmentService appointmentService;
     private final ReportService reportService;
+    private final CalendarService calendarService;
+    private final PetService petService;
 
-    public WebController(UserService userService, AppointmentService appointmentService, ReportService reportService) {
+    public WebController(UserService userService, AppointmentService appointmentService, ReportService reportService, CalendarService calendarService, PetService petService) {
         this.userService = userService;
         this.appointmentService = appointmentService;
         this.reportService = reportService;
+        this.calendarService = calendarService;
+        this.petService = petService;
     }
 
     // Método de ajuda para obter o ID do utilizador logado
@@ -65,14 +77,18 @@ public class WebController {
     }
 
     @GetMapping("/reports")
-    public String reports(Model model) {
-        List<Appointment> allAppointments = appointmentService.findAllAppointments();
+    public String reports(Model model,
+                         @RequestParam(value = "dateRange", defaultValue = "all") String dateRange,
+                         @RequestParam(value = "serviceType", defaultValue = "all") String serviceType,
+                         @RequestParam(value = "status", defaultValue = "all") String status) {
         
-        model.addAttribute("appointments", allAppointments);
-        model.addAttribute("totalRevenue", String.format("€ %.2f", reportService.calculateTotalRevenue()));
-        model.addAttribute("totalServices", String.valueOf(reportService.getTotalServices()));
-        model.addAttribute("avgTicket", String.format("€ %.2f", reportService.calculateAverageTicket()));
-        model.addAttribute("newClients", "18");
+        List<Appointment> filteredAppointments = getFilteredAppointments(dateRange, serviceType, status);
+        
+        model.addAttribute("appointments", filteredAppointments);
+        model.addAttribute("totalRevenue", String.format("€ %.2f", reportService.calculateTotalRevenue(filteredAppointments)));
+        model.addAttribute("totalServices", String.valueOf(reportService.getTotalServices(filteredAppointments)));
+        model.addAttribute("avgTicket", String.format("€ %.2f", reportService.calculateAverageTicket(filteredAppointments)));
+        model.addAttribute("newClients", String.valueOf(reportService.getNewClients(filteredAppointments)));
         model.addAttribute("currentPage", "reports");
         
         return "reports";
@@ -129,11 +145,7 @@ public class WebController {
         return "403";
     }
 
-    @GetMapping("/adminCalendar")
-    public String adminCalendar(Model model) {
-        model.addAttribute("currentPage", "adminCalendar");
-        return "adminCalendar";
-    }
+
 
     @PostMapping("/perfil/deletar")
     public String deleteProfile(RedirectAttributes redirectAttributes) {
@@ -243,5 +255,211 @@ public class WebController {
         }
 
         return "redirect:/perfil";
+    }
+    
+    @GetMapping("/admin/reports/search")
+    @ResponseBody
+    public Map<String, Object> searchReports(
+            @RequestParam(value = "dateRange", defaultValue = "all") String dateRange,
+            @RequestParam(value = "serviceType", defaultValue = "all") String serviceType,
+            @RequestParam(value = "status", defaultValue = "all") String status) {
+        
+        List<Appointment> filteredAppointments = getFilteredAppointments(dateRange, serviceType, status);
+        
+        Map<String, Object> response = new HashMap<>();
+        Map<String, String> metrics = new HashMap<>();
+        
+        metrics.put("totalRevenue", String.format("€ %.2f", reportService.calculateTotalRevenue(filteredAppointments)));
+        metrics.put("totalServices", String.valueOf(reportService.getTotalServices(filteredAppointments)));
+        metrics.put("avgTicket", String.format("€ %.2f", reportService.calculateAverageTicket(filteredAppointments)));
+        metrics.put("newClients", String.valueOf(reportService.getNewClients(filteredAppointments)));
+        
+        List<Map<String, Object>> appointmentData = filteredAppointments.stream()
+            .map(this::convertAppointmentToMap)
+            .collect(java.util.stream.Collectors.toList());
+        
+        response.put("metrics", metrics);
+        response.put("appointments", appointmentData);
+        
+        return response;
+    }
+    
+    private List<Appointment> getFilteredAppointments(String dateRange, String serviceType, String status) {
+        List<Appointment> appointments = appointmentService.findAllAppointments();
+        
+        // Filter by date range
+        if (!"all".equals(dateRange)) {
+            YearMonth currentMonth = YearMonth.now();
+            switch (dateRange) {
+                case "this-month":
+                    appointments = appointmentService.findAppointmentsInMonth(currentMonth);
+                    break;
+                case "last-month":
+                    appointments = appointmentService.findAppointmentsInMonth(currentMonth.minusMonths(1));
+                    break;
+                case "last-30":
+                    LocalDate thirtyDaysAgo = LocalDate.now().minusDays(30);
+                    appointments = appointments.stream()
+                        .filter(apt -> apt.getAppointmentDateTime() != null && 
+                                      !apt.getAppointmentDateTime().toLocalDate().isBefore(thirtyDaysAgo))
+                        .collect(java.util.stream.Collectors.toList());
+                    break;
+            }
+        }
+        
+        // Filter by service type
+        if (!"all".equals(serviceType)) {
+            appointments = appointments.stream()
+                .filter(apt -> apt.getServiceName() != null && serviceType.equals(apt.getServiceName()))
+                .collect(java.util.stream.Collectors.toList());
+        }
+        
+        // Filter by status
+        if (!"all".equals(status)) {
+            appointments = appointments.stream()
+                .filter(apt -> {
+                    switch (status) {
+                        case "paid":
+                            return Boolean.TRUE.equals(apt.getIsPaid());
+                        case "pending":
+                            return "Pending".equals(apt.getStatus()) && !Boolean.TRUE.equals(apt.getIsPaid());
+                        case "confirmed":
+                            return "Confirmed".equals(apt.getStatus());
+                        case "canceled":
+                            return "Canceled".equals(apt.getStatus());
+                        default:
+                            return true;
+                    }
+                })
+                .collect(java.util.stream.Collectors.toList());
+        }
+        
+        return appointments;
+    }
+    
+    @GetMapping("/admin/reports/export")
+    public void exportReports(
+            @RequestParam(value = "dateRange", defaultValue = "last-30") String dateRange,
+            @RequestParam(value = "serviceType", defaultValue = "all") String serviceType,
+            @RequestParam(value = "status", defaultValue = "all") String status,
+            HttpServletResponse response) throws IOException {
+        
+        List<Appointment> filteredAppointments = getFilteredAppointments(dateRange, serviceType, status);
+        
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=relatorio_agendamentos.csv");
+        
+        PrintWriter writer = response.getWriter();
+        writer.println("ID,Cliente,Data,Serviço,Valor,Estado");
+        
+        for (Appointment appointment : filteredAppointments) {
+            writer.printf("%d,%s,%s,%s,%.2f,%s%n",
+                appointment.getId(),
+                appointment.getPet().getNome(),
+                appointment.getFormattedDateTime(),
+                appointment.getServiceName(),
+                appointment.getValue(),
+                appointment.getStatus()
+            );
+        }
+        
+        writer.flush();
+    }
+    
+    @PatchMapping("/admin/appointments/{id}/status")
+    @ResponseBody
+    public ResponseEntity<?> updateAppointmentStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        try {
+            String newStatus = request.get("status");
+            appointmentService.updateAppointmentStatus(id, newStatus);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @GetMapping("/admin/appointments/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getAppointment(@PathVariable Long id) {
+        try {
+            Appointment appointment = appointmentService.findAppointmentById(id);
+            if (appointment == null) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", appointment.getId());
+            response.put("petName", appointment.getPet().getNome());
+            response.put("serviceName", appointment.getServiceName());
+            response.put("dateTimeForInput", appointment.getAppointmentDateTime().toString());
+            response.put("value", appointment.getValue());
+            response.put("status", appointment.getStatus());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @PutMapping("/admin/appointments/{id}")
+    @ResponseBody
+    public ResponseEntity<?> updateAppointment(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+        try {
+            Appointment appointment = appointmentService.findAppointmentById(id);
+            if (appointment == null) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            appointment.setServiceName((String) request.get("serviceName"));
+            appointment.setAppointmentDateTime(java.time.LocalDateTime.parse((String) request.get("appointmentDateTime")));
+            appointment.setValue(new java.math.BigDecimal(request.get("value").toString()));
+            appointment.setStatus((String) request.get("status"));
+            
+            appointmentService.saveAppointment(appointment);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @DeleteMapping("/admin/appointments/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> deleteAppointment(@PathVariable Long id) {
+        try {
+            System.out.println("Attempting to delete appointment with ID: " + id);
+            
+            Appointment appointment = appointmentService.findAppointmentById(id);
+            if (appointment == null) {
+                System.out.println("Appointment not found with ID: " + id);
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Appointment not found");
+                return ResponseEntity.notFound().build();
+            }
+            
+            appointmentService.deleteAppointment(id);
+            System.out.println("Successfully deleted appointment with ID: " + id);
+            
+            Map<String, String> success = new HashMap<>();
+            success.put("message", "Appointment deleted successfully");
+            return ResponseEntity.ok(success);
+        } catch (Exception e) {
+            System.err.println("Error deleting appointment: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(400).body(error);
+        }
+    }
+    
+    private Map<String, Object> convertAppointmentToMap(Appointment appointment) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", appointment.getId());
+        map.put("petName", appointment.getPet().getNome());
+        map.put("formattedDate", appointment.getFormattedDateTime());
+        map.put("value", appointment.getValue());
+        map.put("status", appointment.getStatus());
+        map.put("isPaid", appointment.getIsPaid());
+        return map;
     }
 }

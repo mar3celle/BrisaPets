@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.math.BigDecimal;
@@ -139,6 +136,8 @@ public class AppointmentController {
         servicesAndPrices.put("Banho", pricingService.getServicePrice("Banho"));
         servicesAndPrices.put("Banho e Tosquia Intima", pricingService.getServicePrice("Banho e Tosquia Intima"));
         servicesAndPrices.put("Banho e Tosquia Geral", pricingService.getServicePrice("Banho e Tosquia Geral"));
+        servicesAndPrices.put("Pet Sitting", pricingService.getServicePrice("Pet Sitting"));
+        servicesAndPrices.put("Hosting", pricingService.getServicePrice("Hosting"));
         model.addAttribute("services", servicesAndPrices);
 
 
@@ -150,21 +149,56 @@ public class AppointmentController {
     @PostMapping("/agendar/save")
     public String saveAppointment(
             @ModelAttribute("appointmentForm") Appointment appointment,
-            @RequestParam("petId") Long petId, // ID do Pet selecionado
-            @RequestParam("selectedDate") String dateStr, // Data selecionada (YYYY-MM-DD)
-            @RequestParam("selectedTime") String timeStr, // Hora selecionada (HH:MM)
-            @RequestParam("serviceName") String serviceName, // Serviço selecionado
+            @RequestParam("petId") Long petId,
+            @RequestParam(value = "selectedDate", required = false) String dateStr,
+            @RequestParam(value = "selectedTime", required = false) String timeStr,
+            @RequestParam(value = "startDate", required = false) String startDateStr,
+            @RequestParam(value = "endDate", required = false) String endDateStr,
+            @RequestParam(value = "observations", required = false) String observations,
+            @RequestParam("serviceName") String serviceName,
             RedirectAttributes redirectAttributes) {
 
         try {
-            // 1. Validar e converter Data e Hora para LocalDateTime
-            LocalDate date = LocalDate.parse(dateStr);
-            // Combina a data e hora. O `timeStr` deve estar em HH:MM.
-            LocalDateTime appointmentDateTime = date.atTime(java.time.LocalTime.parse(timeStr));
-
-            // 2. Setar os campos do objeto Appointment com a data/hora e nome do serviço
-            appointment.setAppointmentDateTime(appointmentDateTime);
+            // Set service name first
             appointment.setServiceName(serviceName);
+            
+            // Handle date range services vs regular services
+            boolean isDateRangeService = "Pet Sitting".equals(serviceName) || "Hosting".equals(serviceName);
+            
+            if (isDateRangeService) {
+                // Handle date range services
+                if (startDateStr == null || startDateStr.isEmpty()) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Erro: Data de início é obrigatória.");
+                    return "redirect:/agendar";
+                }
+                
+                LocalDate startDate = LocalDate.parse(startDateStr);
+                LocalDate endDate = (endDateStr != null && !endDateStr.isEmpty()) ? 
+                    LocalDate.parse(endDateStr) : startDate;
+                
+                // Validate date range
+                if (endDate.isBefore(startDate)) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Erro: Data de fim deve ser posterior à data de início.");
+                    return "redirect:/agendar";
+                }
+                
+                appointment.setStartDate(startDate);
+                appointment.setEndDate(endDate);
+                appointment.setObservations(observations);
+                
+                // Set appointment datetime to start date at 9:00 for compatibility
+                appointment.setAppointmentDateTime(startDate.atTime(9, 0));
+            } else {
+                // Handle regular services
+                if (dateStr == null || timeStr == null) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Erro: Data e hora são obrigatórias.");
+                    return "redirect:/agendar";
+                }
+                
+                LocalDate date = LocalDate.parse(dateStr);
+                LocalDateTime appointmentDateTime = date.atTime(java.time.LocalTime.parse(timeStr));
+                appointment.setAppointmentDateTime(appointmentDateTime);
+            }
 
             // 3. Buscar o Pet para associar (garantir que ele pertence ao utilizador logado)
             Optional<Pet> optionalPet = petService.findPetById(petId);
@@ -188,25 +222,54 @@ public class AppointmentController {
             appointment.setIsPaid(false); // Por defeito não pago
 
             // 5. Validar se a data é futura
-            if (appointmentDateTime.isBefore(java.time.LocalDateTime.now())) {
+            LocalDateTime checkDateTime = isDateRangeService ? 
+                appointment.getStartDate().atTime(9, 0) : appointment.getAppointmentDateTime();
+                
+            if (checkDateTime.isBefore(java.time.LocalDateTime.now())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Erro: Não é possível agendar para uma data passada.");
                 return "redirect:/agendar";
             }
+            
+            // 6. Verificar disponibilidade
+            if (isDateRangeService) {
+                if (!appointmentService.isDateRangeAvailable(appointment.getStartDate(), appointment.getEndDate())) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Erro: Período não disponível. Escolha outras datas.");
+                    return "redirect:/agendar";
+                }
+            } else {
+                if (!appointmentService.isSlotAvailable(appointment.getAppointmentDateTime())) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Erro: Este horário já está ocupado. Escolha outro horário.");
+                    return "redirect:/agendar";
+                }
+            }
 
 
-            // 6. Salvar o agendamento
+            // 7. Salvar o agendamento
             appointmentService.saveAppointment(appointment);
-            redirectAttributes.addFlashAttribute("successMessage", "Agendamento criado com sucesso para " + appointment.getFormattedDateTime() + "!");
+            String successMessage = isDateRangeService ? 
+                "Reserva criada com sucesso para " + appointment.getFormattedDateRange() + "!" :
+                "Agendamento criado com sucesso para " + appointment.getFormattedDateTime() + "!";
+            redirectAttributes.addFlashAttribute("successMessage", successMessage);
         } catch (java.time.format.DateTimeParseException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro no formato da Data/Hora.");
             return "redirect:/agendar";
         } catch (Exception e) {
-            // Logar o erro para debug
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "Erro inesperado ao criar o agendamento. " + e.getMessage());
             return "redirect:/agendar";
         }
 
         return "redirect:/appointments";
+    }
+    
+    @GetMapping("/api/availability")
+    @ResponseBody
+    public List<String> getAvailableSlots(@RequestParam("date") String dateStr) {
+        try {
+            LocalDate date = LocalDate.parse(dateStr);
+            return appointmentService.getAvailableTimeSlots(date);
+        } catch (Exception e) {
+            return List.of(); // Return empty list on error
+        }
     }
 }

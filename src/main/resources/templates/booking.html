@@ -91,13 +91,37 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="service-option" data-service-name="Pet Sitting">
+                    <div class="service-icon-circle"><i class="fas fa-home"></i></div>
+                    <div class="service-details">
+                        <h4>Pet Sitting</h4>
+                        <p>Cuidado personalizado do seu pet na sua própria casa</p>
+                        <div class="service-meta">
+                            <span><i class="fas fa-calendar"></i> Por período</span>
+                            <span class="price-tag bold-value">30€/dia</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-option" data-service-name="Hosting">
+                    <div class="service-icon-circle"><i class="fas fa-bed"></i></div>
+                    <div class="service-details">
+                        <h4>Hosting</h4>
+                        <p>Hospedagem completa do seu pet nas nossas instalações</p>
+                        <div class="service-meta">
+                            <span><i class="fas fa-calendar"></i> Por período</span>
+                            <span class="price-tag bold-value">40€/dia</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="schedule-container">
                 <h3 class="subsection-title">Selecionar Horário</h3>
 
                 <div class="date-time-box">
-                    <h4 class="box-title"><i class="fas fa-calendar-alt"></i> Escolher Data e Hora</h4>
+                    <h4 class="box-title" id="dateTimeTitle"><i class="fas fa-calendar-alt"></i> Escolher Data e Hora</h4>
 
                     <div class="calendar-header">
                         <a th:href="@{/agendar(year=${prevMonthYear}, month=${prevMonth})}">
@@ -145,13 +169,33 @@
                         <button type="button" class="time-slot active-time" data-time-value="17:00">17:00</button>
                     </div>
 
+                    <!-- Date range fields for Pet Sitting and Hosting -->
+                    <div class="date-range-container" id="dateRangeContainer" style="display: none;">
+                        <div class="date-range-inputs">
+                            <div class="date-input-group">
+                                <label for="startDate">Data de Início:</label>
+                                <input type="date" id="startDate" name="startDate" class="form-control" />
+                            </div>
+                            <div class="date-input-group">
+                                <label for="endDate">Data de Fim:</label>
+                                <input type="date" id="endDate" name="endDate" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observations field for Pet Sitting and Hosting -->
+                    <div class="observations-container" id="observationsContainer" style="display: none;">
+                        <label for="observations">Observações (opcional):</label>
+                        <textarea id="observations" name="observations" class="form-control" rows="3" placeholder="Informações adicionais sobre o seu pet ou preferências especiais..."></textarea>
+                    </div>
+
                     <input type="hidden" id="serviceName" name="serviceName" value="" />
                     <input type="hidden" id="selectedDate" name="selectedDate" value="" />
                     <input type="hidden" id="selectedTime" name="selectedTime" value="" />
 
 
                     <button type="submit" class="btn btn-confirm-appointment" id="confirmAppointmentBtn" disabled>
-                        <i class="fas fa-calendar-check"></i> Confirmar Agendamento
+                        <i class="fas fa-calendar-check"></i> <span id="confirmButtonText">Confirmar Agendamento</span>
                     </button>
                 </div>
             </div>

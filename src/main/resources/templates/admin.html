@@ -50,6 +50,45 @@
         </div>
 
         <div class="card" style="margin-top: 2rem;">
+            <h3>Agendamentos Recentes</h3>
+            <table style="width: 100%; margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Pet</th>
+                        <th>Serviço</th>
+                        <th>Data/Hora</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="appointment : ${allAppointments}">
+                        <td th:text="${appointment.pet.nome}">Pet</td>
+                        <td th:text="${appointment.serviceName}">Serviço</td>
+                        <td th:text="${appointment.formattedDateTime}">Data</td>
+                        <td>
+                            <span th:if="${appointment.pending}" class="badge" style="background: #fff3cd; color: #856404;">Pendente</span>
+                            <span th:if="${appointment.confirmed}" class="badge" style="background: #d4edda; color: #155724;">Confirmado</span>
+                            <span th:unless="${appointment.pending or appointment.confirmed}" class="badge" style="background: #f8d7da; color: #721c24;">Cancelado</span>
+                        </td>
+                        <td>
+                            <form th:if="${appointment.pending}" th:action="@{/admin/appointment/confirm/{id}(id=${appointment.id})}" method="post" style="display: inline; margin-right: 5px;">
+                                <button type="submit" class="btn-confirm" style="background: #28a745; padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-check"></i> Confirmar
+                                </button>
+                            </form>
+                            <form th:if="${appointment.pending}" th:action="@{/admin/appointment/cancel/{id}(id=${appointment.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="btn-confirm" style="background: #dc3545; padding: 5px 10px; font-size: 0.8rem;" onclick="return confirm('Cancelar agendamento?')">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
             <h3>Utilizadores</h3>
             <table style="width: 100%; margin-top: 1rem;">
                 <thead>

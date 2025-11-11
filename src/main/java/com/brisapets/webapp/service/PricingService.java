@@ -15,6 +15,8 @@ public class PricingService {
         servicePrices.put("Banho", new BigDecimal("25.00"));
         servicePrices.put("Banho e Tosquia Intima", new BigDecimal("35.00"));
         servicePrices.put("Banho e Tosquia Geral", new BigDecimal("50.00"));
+        servicePrices.put("Pet Sitting", new BigDecimal("30.00"));
+        servicePrices.put("Hosting", new BigDecimal("40.00"));
     }
     
     public BigDecimal getServicePrice(String serviceName) {

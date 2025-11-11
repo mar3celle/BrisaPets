@@ -75,6 +75,10 @@ public class SecurityConfig {
                 // 🌟 NOVO: Tratamento de Exceção para Acesso Negado (403 Forbidden)
                 .exceptionHandling(exceptions -> exceptions
                         .accessDeniedPage("/403") // Redireciona para uma página de erro 403
+                )
+                // Disable CSRF for API endpoints
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/admin/appointments/**")
                 );
 
 
