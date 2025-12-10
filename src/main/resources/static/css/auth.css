@@ -1,0 +1,265 @@
+/*
+    ---------------------------------------------------------
+    Estilos Específicos para a Página de Autenticação (Login/Registro)
+    ---------------------------------------------------------
+*/
+
+.auth-body {
+    background-color: #f7f7f7; /* Fundo cinza bem claro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Container principal */
+.login-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    text-align: center;
+}
+
+/* ---------------------------------------------------------
+   Cabeçalho (Seta de Volta e Logo)
+   --------------------------------------------------------- */
+.auth-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.back-link {
+    position: absolute;
+    left: 0;
+    font-size: 1.5em;
+    color: #333;
+    transition: color 0.3s;
+}
+
+.back-link:hover {
+    color: var(--color-primary);
+}
+
+.logo-auth {
+    display: flex;
+    align-items: center;
+    font-size: 1.1em;
+    font-weight: 700;
+}
+
+.logo-icon-sm {
+    color: var(--color-primary);
+    margin-right: 5px;
+    font-size: 1.3em;
+}
+
+/* ---------------------------------------------------------
+   Cartão Principal
+   --------------------------------------------------------- */
+.auth-card {
+    background-color: var(--color-white);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.auth-title {
+    font-size: 1.8em;
+    color: var(--color-text-dark);
+    margin-bottom: 5px;
+}
+
+.auth-subtitle {
+    color: var(--color-text-light);
+    font-size: 1em;
+    margin-bottom: 30px;
+}
+
+/* ---------------------------------------------------------
+   Abas de Navegação (Entrar / Criar Conta)
+   --------------------------------------------------------- */
+.tab-navigation {
+    display: flex;
+    background-color: var(--color-background-light);
+    border-radius: 10px;
+    margin-bottom: 30px;
+    padding: 5px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: transparent;
+    font-weight: 600;
+    color: var(--color-text-light);
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.tab-btn.active {
+    background-color: var(--color-white);
+    color: var(--color-primary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* ---------------------------------------------------------
+   Formulário e Campos
+   --------------------------------------------------------- */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.auth-form label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: 8px;
+}
+
+/* Inputs */
+.input-light-blue,
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form input[type="text"] {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #e9eef6;
+    background-color: #f0f6ff;
+    color: var(--color-text-dark);
+    font-size: 1rem;
+    outline: none;
+    margin-bottom: 14px;
+    transition: box-shadow 0.18s, border-color 0.18s, background 0.18s;
+}
+
+/* Foco */
+.input-light-blue:focus,
+.auth-form input:focus {
+    border-color: rgba(254, 135, 160, 0.9);
+    box-shadow: 0 8px 24px rgba(254, 135, 160, 0.10);
+    background: #fff;
+}
+
+/* Autofill (remove fundo azul do Chrome) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-text-dark) !important;
+    -webkit-box-shadow: 0 0 0px 1000px #f0f6ff inset !important;
+    box-shadow: 0 0 0px 1000px #f0f6ff inset !important;
+}
+
+/* Botão principal */
+.btn-submit {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 14px 22px;
+    margin-top: 12px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    display: inline-block;
+    width: 220px;
+    max-width: 100%;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: #e06e86;
+}
+
+/* Mensagens Thymeleaf */
+.text-danger,
+.alert-error,
+.alert-success {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+}
+
+/* Esconde formulário inativo */
+.hidden {
+    display: none;
+}
+
+/* Google OAuth Button */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    color: #666;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.divider span {
+    padding: 0 15px;
+    font-size: 14px;
+}
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-google:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+}
+
+.btn-google i {
+    color: #4285f4;
+    font-size: 18px;
+}
+
+/* ---------------------------------------------------------
+   Responsividade
+   --------------------------------------------------------- */
+@media (max-width: 500px) {
+    .auth-card {
+        padding: 28px 18px;
+    }
+
+    .btn-submit {
+        width: 100%;
+    }
+
+    .tab-navigation {
+        flex-direction:

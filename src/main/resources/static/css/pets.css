@@ -1,0 +1,171 @@
+
+/* Estilos para o Grid de Pets */
+.pets-grid {
+    /* Permite até 4 colunas de min. 250px */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 4 cards por linha */
+    gap: 30px;
+    margin-top: 30px;
+}
+
+/* Estilo do Card individual do Pet */
+.pet-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s;
+}
+
+.pet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.pet-image-container {
+    height: 150px;
+    width: 100%;
+    background-color: #fce4ec; /* Rosa claro para o placeholder */
+    border-radius: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.pet-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que a imagem preenche o container */
+}
+
+.pet-emoji {
+    font-size: 3rem;
+}
+
+.pet-details h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.pet-details p {
+    font-size: 0.95rem;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.pet-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background-color: #ffe0f0;
+    color: #d81b60;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    flex-grow: 1; /* Faz o botão de agendar crescer */
+    text-align: center;
+}
+
+.btn-secondary:hover {
+    background-color: #f8bbd0;
+}
+
+.btn-delete {
+    background: none;
+    color: #e57373; /* Cor vermelha suave para deleção */
+    border: 1px solid #ffcdd2;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #ffcdd2;
+    color: #c62828;
+}
+
+/* Estilos para o formulário de adição (Aparece no modal ou seção dedicada) */
+.add-pet-container {
+    background-color: #ffffff; /* Fundo branco como os outros cards */
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+    padding: 25px; /* Padding ajustado para o card */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Remover margens que o tiram do fluxo do grid, se houver: */
+    margin-bottom: 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.add-pet-container input[type="text"],
+.add-pet-container input[type="number"],
+.add-pet-container select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+.add-pet-container .btn-primary {
+    /* Adapte este estilo ao seu btn-primary global */
+    background-color: var(--color-primary);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 15px; /* Espaço do topo */
+}
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+    margin-left: 10px;
+}
+
+.no-pets {
+    grid-column: 1 / -1; /* Ocupa toda a largura do grid */
+    text-align: center;
+    padding: 40px;
+    border: 2px dashed #ffcdd2;
+    border-radius: 12px;
+    color: #d81b60;
+    background-color: #fffafc;
+}
+
+.no-pets a {
+    color: #d81b60;
+    font-weight: 600;
+    text-decoration: underline;
+}

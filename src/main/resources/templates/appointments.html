@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-PT" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brisa Pets - Meus Agendamentos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/appointments.css"> </head>
+<body>
+
+<header class="header">
+    <div class="logo-container">
+        <i class="fas fa-heart logo-icon"></i>
+        <span class="logo-name">Brisa Pets</span>
+        <span class="logo-slogan">Cuidados com amor</span>
+    </div>
+    <nav class="nav-menu-internal">
+        <a href="/pets" class="nav-link-icon"><i class="fas fa-paw"></i> Meus Pets</a>
+        <a href="/agendar" class="nav-link-icon"><i class="fas fa-calendar-alt"></i> Agendar Serviço</a>
+        <a href="/appointments" class="nav-link-icon active"><i class="fas fa-list-alt"></i> Meus Agendamentos</a>
+        <a href="/hospedagem" class="nav-link-icon"><i class="fas fa-bed"></i> Hospedagem</a>
+        <a href="/perfil" class="nav-link-icon"><i class="fas fa-user-circle"></i> Perfil</a>
+        <a href="/logout" class="nav-link-icon sair"><i class="fas fa-sign-out-alt"></i> Sair</a>
+    </nav>
+</header>
+
+<section class="section-padded">
+    <div class="section-tag-small internal-tag">Histórico</div>
+    <h2 class="section-title">Próximos Agendamentos</h2>
+    <p class="section-subtitle">
+        Visualize os detalhes de todos os serviços que você agendou para os seus pets.
+    </p>
+
+    <div th:if="${appointments.isEmpty()}" class="no-appointments">
+        <i class="fas fa-calendar-times fa-3x mb-3"></i>
+        <p>Ainda não há agendamentos. <a th:href="@{/agendar}">Clique aqui para agendar um serviço!</a></p>
+    </div>
+
+    <div th:unless="${appointments.isEmpty()}">
+        <table class="appointment-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Pet</th>
+                <th>Serviço</th>
+                <th>Data</th>
+                <th>Hora</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="appt : ${appointments}">
+                <td th:text="${appt.id}">1</td>
+                <td th:text="${appt.pet.nome}">Rex</td>
+                <td th:text="${appt.serviceName}">Banho Completo</td>
+                <td th:text="${#temporals.format(appt.appointmentDateTime, 'dd/MM/yyyy')}">20/11/2025</td>
+                <td th:text="${#temporals.format(appt.appointmentDateTime, 'HH:mm')}">14:00</td>
+                <td>
+                    <span class="status-badge status-confirmed">Confirmado</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</section>
+</body>
+</html>

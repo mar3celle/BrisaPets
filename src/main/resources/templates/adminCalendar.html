@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-PT" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brisa Pets - Admin Agendamentos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/booking.css">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="p-6">
+            <h1><i class="fas fa-heart"></i> Brisa Pets <span class="logo-sub">Admin</span></h1>
+            <nav>
+                <a href="/admin" class="sidebar-item" th:classappend="${currentPage == 'admin'} ? 'active' : ''" id="nav-dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="/reports" class="sidebar-item" th:classappend="${currentPage == 'reports'} ? 'active' : ''" id="nav-reports">
+                    <i class="fas fa-file-alt"></i> Relatórios
+                </a>
+                <a href="/clientlist" class="sidebar-item" th:classappend="${currentPage == 'clientlist'} ? 'active' : ''" id="nav-clients">
+                    <i class="fas fa-users"></i> Clientes
+                </a>
+                <a href="/adminCalendar" class="sidebar-item" th:classappend="${currentPage == 'adminCalendar'} ? 'active' : ''" id="nav-adminCalendar">
+                    <i class="fas fa-calendar-alt"></i> Agendamentos
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <h1 id="page-title">Gestão de Agendamentos</h1>
+        
+        <!-- Success/Error Messages -->
+        <div th:if="${adminMessage}" class="alert alert-success" style="background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
+            <span th:text="${adminMessage}"></span>
+        </div>
+        <div th:if="${adminError}" class="alert alert-danger" style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
+            <span th:text="${adminError}"></span>
+        </div>
+        
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Calendário de Agendamentos</h3>
+                <button onclick="showAppointmentForm()" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Novo Agendamento
+                </button>
+            </div>
+            
+            <div class="calendar-header">
+                <a th:href="@{/adminCalendar(year=${prevMonthYear}, month=${prevMonth})}">
+                    <button type="button" class="nav-button"><i class="fas fa-chevron-left"></i></button>
+                </a>
+                <div class="month-year" th:text="${#temporals.format(currentYearMonth.atDay(1), 'MMMM yyyy')}">Novembro 2025</div>
+                <a th:href="@{/adminCalendar(year=${nextMonthYear}, month=${nextMonth})}">
+                    <button type="button" class="nav-button"><i class="fas fa-chevron-right"></i></button>
+                </a>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid">
+                <span class="day-name">Dom</span>
+                <span class="day-name">Seg</span>
+                <span class="day-name">Ter</span>
+                <span class="day-name">Qua</span>
+                <span class="day-name">Qui</span>
+                <span class="day-name">Sex</span>
+                <span class="day-name">Sáb</span>
+
+                <th:block th:each="day : ${calendarDays}">
+                    <span th:if="${day == null}"></span>
+                    <th:block th:if="${day != null}">
+                        <div class="calendar-day" 
+                             th:attr="data-date-value=${currentYearMonth.atDay(day)}" 
+                             th:classappend="${currentYearMonth.atDay(day).isBefore(currentDate) ? 'day-disabled' : ''}">
+                            <span class="day-number" th:text="${day}"></span>
+                            <div class="day-appointments">
+                                <th:block th:each="appointment : ${monthAppointments}">
+                                    <div th:if="${appointment.appointmentDateTime != null and #temporals.format(appointment.appointmentDateTime, 'yyyy-MM-dd') == currentYearMonth.atDay(day).toString()}" 
+                                         class="appointment-indicator"
+                                         th:classappend="${appointment.isPaid ? 'paid' : (appointment.status == 'Confirmed' ? 'confirmed' : 'pending')}"
+                                         th:title="${appointment.serviceName + ' - ' + appointment.pet.nome}">
+                                        <i class="fas fa-circle"></i>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                    </th:block>
+                </th:block>
+            </div>
+            
+            <div id="appointment-form" style="display: none; margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h4>Novo Agendamento</h4>
+                <form action="/admin/appointment/save" method="post">
+                    <div id="single-date-fields">
+                        <div style="margin-bottom: 15px;">
+                            <label>Data Selecionada:</label>
+                            <input type="text" id="selected-date-display" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <input type="hidden" id="selected-date" name="selectedDate">
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label>Horário:</label>
+                            <div class="time-slots" id="timeSlots">
+                                <button type="button" class="time-slot" data-time-value="09:00">09:00</button>
+                                <button type="button" class="time-slot" data-time-value="10:00">10:00</button>
+                                <button type="button" class="time-slot" data-time-value="11:00">11:00</button>
+                                <button type="button" class="time-slot" data-time-value="14:00">14:00</button>
+                                <button type="button" class="time-slot" data-time-value="15:00">15:00</button>
+                                <button type="button" class="time-slot" data-time-value="16:00">16:00</button>
+                                <button type="button" class="time-slot" data-time-value="17:00">17:00</button>
+                            </div>
+                            <input type="hidden" id="selected-time" name="selectedTime">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label>Pet:</label>
+                        <select name="petId" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                            <option value="">Selecione um Pet</option>
+                            <option th:each="pet : ${allPets}" th:value="${pet.id}" th:text="${pet.nome + ' (' + pet.tutorId + ')'}"></option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label>Serviço:</label>
+                        <select id="service-select" name="serviceName" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                            <option value="">Selecione um Serviço</option>
+                            <option value="Banho">Banho - €25</option>
+                            <option value="Banho e Tosquia Intima">Banho e Tosquia Íntima - €35</option>
+                            <option value="Banho e Tosquia Geral">Banho e Tosquia Geral - €50</option>
+                            <option value="Pet Sitting">Pet Sitting - €30/dia</option>
+                            <option value="Hosting">Hosting - €40/dia</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Date range display for Pet Sitting and Hosting -->
+                    <div id="date-range-display" style="display: none; margin-bottom: 15px;">
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div style="flex: 1;">
+                                <label>Período Selecionado:</label>
+                                <div id="selected-range-text" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; min-height: 20px;">Selecione as datas no calendário</div>
+                            </div>
+                            <button type="button" id="clear-range-btn" class="btn" style="background: #6c757d; color: white; padding: 8px 12px;">Limpar</button>
+                        </div>
+                        <input type="hidden" id="start-date" name="startDate">
+                        <input type="hidden" id="end-date" name="endDate">
+                    </div>
+                    
+                    <!-- Observations field -->
+                    <div id="observations-field" style="display: none; margin-bottom: 15px;">
+                        <label>Observações (opcional):</label>
+                        <textarea name="observations" rows="3" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; resize: vertical;" placeholder="Informações adicionais sobre o pet ou preferências especiais..."></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary" id="submit-btn">Criar Agendamento</button>
+                        <button type="button" class="btn" onclick="hideAppointmentForm()" style="background: #6c757d; color: white;">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAppointmentForm() {
+            document.getElementById('appointment-form').style.display = 'block';
+        }
+        
+        function hideAppointmentForm() {
+            document.getElementById('appointment-form').style.display = 'none';
+            // Reset form
+            document.querySelectorAll('.day-number').forEach(d => {
+                d.classList.remove('selected', 'range-start', 'range-end', 'in-range');
+            });
+            document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+            document.getElementById('selected-date-display').value = '';
+            document.getElementById('selected-date').value = '';
+            document.getElementById('selected-time').value = '';
+            document.getElementById('start-date').value = '';
+            document.getElementById('end-date').value = '';
+            document.getElementById('service-select').value = '';
+            document.getElementById('selected-range-text').textContent = 'Selecione as datas no calendário';
+            document.getElementById('single-date-fields').style.display = 'block';
+            document.getElementById('date-range-display').style.display = 'none';
+            document.getElementById('observations-field').style.display = 'none';
+        }
+        
+        // Day selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const serviceSelect = document.getElementById('service-select');
+            const singleDateFields = document.getElementById('single-date-fields');
+            const dateRangeDisplay = document.getElementById('date-range-display');
+            const observationsField = document.getElementById('observations-field');
+            const startDateInput = document.getElementById('start-date');
+            const endDateInput = document.getElementById('end-date');
+            const selectedRangeText = document.getElementById('selected-range-text');
+            const clearRangeBtn = document.getElementById('clear-range-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            let isDateRangeMode = false;
+            let rangeStartDate = null;
+            let rangeEndDate = null;
+            
+            // Service selection handler
+            serviceSelect.addEventListener('change', function() {
+                isDateRangeMode = this.value === 'Pet Sitting' || this.value === 'Hosting';
+                clearSelection();
+                
+                if (isDateRangeMode) {
+                    singleDateFields.style.display = 'none';
+                    dateRangeDisplay.style.display = 'block';
+                    observationsField.style.display = 'block';
+                } else {
+                    singleDateFields.style.display = 'block';
+                    dateRangeDisplay.style.display = 'none';
+                    observationsField.style.display = 'none';
+                }
+                updateSubmitButton();
+            });
+            
+            // Clear range selection
+            clearRangeBtn.addEventListener('click', function() {
+                clearSelection();
+            });
+            
+            function clearSelection() {
+                rangeStartDate = null;
+                rangeEndDate = null;
+                
+                document.querySelectorAll('.day-number').forEach(d => {
+                    d.classList.remove('selected', 'range-start', 'range-end', 'in-range');
+                });
+                
+                startDateInput.value = '';
+                endDateInput.value = '';
+                selectedRangeText.textContent = 'Selecione as datas no calendário';
+                document.getElementById('selected-date').value = '';
+                document.getElementById('selected-time').value = '';
+                updateSubmitButton();
+            }
+            
+            function updateRangeDisplay() {
+                if (rangeStartDate && rangeEndDate) {
+                    const start = new Date(rangeStartDate).toLocaleDateString('pt-PT');
+                    const end = new Date(rangeEndDate).toLocaleDateString('pt-PT');
+                    selectedRangeText.textContent = start === end ? start : `${start} - ${end}`;
+                    startDateInput.value = rangeStartDate;
+                    endDateInput.value = rangeEndDate;
+                } else if (rangeStartDate) {
+                    selectedRangeText.textContent = new Date(rangeStartDate).toLocaleDateString('pt-PT') + ' (selecione data final)';
+                    startDateInput.value = rangeStartDate;
+                }
+                updateSubmitButton();
+            }
+            
+            function updateSubmitButton() {
+                if (isDateRangeMode) {
+                    submitBtn.disabled = !rangeStartDate || !serviceSelect.value;
+                } else {
+                    const hasDate = document.getElementById('selected-date').value;
+                    const hasTime = document.getElementById('selected-time').value;
+                    submitBtn.disabled = !hasDate || !hasTime || !serviceSelect.value;
+                }
+            }
+            
+            function highlightRange() {
+                document.querySelectorAll('.day-number').forEach(day => {
+                    day.classList.remove('in-range');
+                    const dayDate = day.getAttribute('data-date-value');
+                    
+                    if (rangeStartDate && rangeEndDate && dayDate >= rangeStartDate && dayDate <= rangeEndDate) {
+                        day.classList.add('in-range');
+                    }
+                });
+                
+                // Check availability for the selected range
+                if (rangeStartDate && rangeEndDate && isDateRangeMode) {
+                    checkRangeAvailability(rangeStartDate, rangeEndDate);
+                }
+            }
+            
+            function checkRangeAvailability(startDate, endDate) {
+                fetch(`/api/admin/availability/range?startDate=${startDate}&endDate=${endDate}`)
+                    .then(response => response.json())
+                    .then(isAvailable => {
+                        const rangeText = document.getElementById('selected-range-text');
+                        if (!isAvailable) {
+                            rangeText.style.color = '#dc3545';
+                            rangeText.style.fontWeight = 'bold';
+                            document.querySelectorAll('.in-range, .range-start, .range-end').forEach(day => {
+                                day.style.backgroundColor = '#f8d7da';
+                                day.style.color = '#721c24';
+                            });
+                        } else {
+                            rangeText.style.color = '';
+                            rangeText.style.fontWeight = '';
+                            document.querySelectorAll('.in-range, .range-start, .range-end').forEach(day => {
+                                day.style.backgroundColor = '';
+                                day.style.color = '';
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Error checking availability:', error));
+            }
+            
+            // Day click handler
+            document.querySelectorAll('.day-number').forEach(day => {
+                day.addEventListener('click', function() {
+                    if (this.classList.contains('day-disabled')) return;
+                    
+                    const dateValue = this.getAttribute('data-date-value');
+                    
+                    if (isDateRangeMode) {
+                        if (!rangeStartDate || (rangeStartDate && rangeEndDate)) {
+                            // Start new selection
+                            clearSelection();
+                            rangeStartDate = dateValue;
+                            this.classList.add('range-start');
+                        } else if (rangeStartDate && !rangeEndDate) {
+                            // Complete the range
+                            if (dateValue >= rangeStartDate) {
+                                rangeEndDate = dateValue;
+                                this.classList.add('range-end');
+                            } else {
+                                // Swap if end is before start
+                                rangeEndDate = rangeStartDate;
+                                rangeStartDate = dateValue;
+                                document.querySelector('.range-start').classList.remove('range-start');
+                                this.classList.add('range-start');
+                                document.querySelector(`[data-date-value="${rangeEndDate}"]`).classList.add('range-end');
+                            }
+                            highlightRange();
+                        }
+                        updateRangeDisplay();
+                    } else {
+                        // Single date selection
+                        document.querySelectorAll('.day-number').forEach(d => d.classList.remove('selected'));
+                        this.classList.add('selected');
+                        document.getElementById('selected-date').value = dateValue;
+                        document.getElementById('selected-date-display').value = new Date(dateValue).toLocaleDateString('pt-PT');
+                        updateSubmitButton();
+                    }
+                });
+            });
+            
+            // Time selection
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.addEventListener('click', function() {
+                    document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('selected-time').value = this.getAttribute('data-time-value');
+                    updateSubmitButton();
+                });
+            });
+            
+            updateSubmitButton();
+        });
+    </script>
+</body>
+</html>

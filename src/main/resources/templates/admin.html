@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-PT" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brisa Pets - Painel Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+    <div class="p-6">
+        <h1><i class="fas fa-heart"></i> Brisa Pets <span class="logo-sub">Admin</span></h1>
+        <nav>
+            <a href="/admin" class="sidebar-item" th:classappend="${currentPage == 'admin'} ? 'active' : ''" id="nav-dashboard">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="/reports" class="sidebar-item" th:classappend="${currentPage == 'reports'} ? 'active' : ''" id="nav-reports">
+                <i class="fas fa-file-alt"></i> Relatórios
+            </a>
+            <a href="/clientlist" class="sidebar-item" th:classappend="${currentPage == 'clientlist'} ? 'active' : ''" id="nav-clients">
+                <i class="fas fa-users"></i> Clientes
+            </a>
+            <a href="/adminCalendar" class="sidebar-item" th:classappend="${currentPage == 'adminCalendar'} ? 'active' : ''" id="nav-adminCalendar">
+                <i class="fas fa-calendar-alt"></i> Agendamentos
+            </a>
+        </nav>
+    </div>
+</aside>
+
+
+    <div class="main-wrapper">
+        <h1 id="page-title">Painel de Administração</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-title">Total Utilizadores</div>
+                <div class="stat-value" th:text="${allUsers.size()}">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Total Pets</div>
+                <div class="stat-value" th:text="${allPets.size()}">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Total Agendamentos</div>
+                <div class="stat-value" th:text="${allAppointments.size()}">0</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+            <h3>Agendamentos Recentes</h3>
+            <table style="width: 100%; margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Pet</th>
+                        <th>Serviço</th>
+                        <th>Data/Hora</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="appointment : ${allAppointments}">
+                        <td th:text="${appointment.pet.nome}">Pet</td>
+                        <td th:text="${appointment.serviceName}">Serviço</td>
+                        <td th:text="${appointment.formattedDateTime}">Data</td>
+                        <td>
+                            <span th:if="${appointment.pending}" class="badge" style="background: #fff3cd; color: #856404;">Pendente</span>
+                            <span th:if="${appointment.confirmed}" class="badge" style="background: #d4edda; color: #155724;">Confirmado</span>
+                            <span th:unless="${appointment.pending or appointment.confirmed}" class="badge" style="background: #f8d7da; color: #721c24;">Cancelado</span>
+                        </td>
+                        <td>
+                            <form th:if="${appointment.pending}" th:action="@{/admin/appointment/confirm/{id}(id=${appointment.id})}" method="post" style="display: inline; margin-right: 5px;">
+                                <button type="submit" class="btn-confirm" style="background: #28a745; padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-check"></i> Confirmar
+                                </button>
+                            </form>
+                            <form th:if="${appointment.pending}" th:action="@{/admin/appointment/cancel/{id}(id=${appointment.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="btn-confirm" style="background: #dc3545; padding: 5px 10px; font-size: 0.8rem;" onclick="return confirm('Cancelar agendamento?')">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+            <h3>Utilizadores</h3>
+            <table style="width: 100%; margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${allUsers}">
+                        <td th:text="${user.firstName + ' ' + user.lastName}">Nome</td>
+                        <td th:text="${user.email}">email@example.com</td>
+                        <td>
+                            <span th:each="role : ${user.roles}" th:text="${role.name}" class="badge badge-new"></span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/user/delete/{id}(id=${user.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="btn-confirm" onclick="return confirm('Eliminar utilizador?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

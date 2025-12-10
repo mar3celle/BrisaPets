@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-PT" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brisa Pets - Meu Perfil</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="logo-container">
+        <i class="fas fa-heart logo-icon"></i>
+        <span class="logo-name">Brisa Pets</span>
+        <span class="logo-slogan">Cuidados com amor</span>
+    </div>
+    <nav class="nav-menu-internal">
+        <a href="/pets" class="nav-link-icon"><i class="fas fa-paw"></i> Meus Pets</a>
+        <a href="/agendar" class="nav-link-icon"><i class="fas fa-calendar-alt"></i> Agendar Serviço</a>
+        <a href="/appointments" class="nav-link-icon"><i class="fas fa-list-alt"></i> Meus Agendamentos</a>
+        <a href="/perfil" class="nav-link-icon active"><i class="fas fa-user-circle"></i> Perfil</a>
+        <a href="/logout" class="nav-link-icon sair"><i class="fas fa-sign-out-alt"></i> Sair</a>
+    </nav>
+</header>
+
+<section class="section-padded">
+    <div class="section-tag-small internal-tag">Configurações</div>
+    <h2 class="section-title">Bem-vindo(a), <span th:text="${user.firstName}">Nome do Tutor</span></h2>
+    <p class="section-subtitle">
+        Gerencie as suas informações de contacto e credenciais.
+    </p>
+
+    <div class="profile-container">
+        <div class="profile-card">
+            <h3><i class="fas fa-user-circle"></i> Informações de Conta</h3>
+            <div id="profile-display">
+                <p><strong>Nome:</strong> <span th:text="${user.firstName} + ' ' + ${user.lastName}">Nome Completo</span></p>
+                <p><strong>Email:</strong> <span th:text="${user.email}">email@exemplo.com</span></p>
+                <p><strong>Telefone:</strong> <span th:text="${user.phone} ?: '+351 XXX XXX XXX'">+351 9XX XXX XXX</span></p>
+                <button onclick="editProfile()" style="background: #d81b60; color: white; padding: 8px 15px; border: none; border-radius: 4px; margin-top: 15px;"><i class="fas fa-edit"></i> Editar</button>
+            </div>
+            
+            <form id="profile-form" th:action="@{/perfil/edit/profile}" method="post" style="display: none; margin-top: 20px;">
+                <input type="text" name="firstName" th:value="${user.firstName}" placeholder="Primeiro Nome" required style="margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" name="lastName" th:value="${user.lastName}" placeholder="Último Nome" required style="margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" name="phone" th:value="${user.phone}" placeholder="Telefone" style="margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                <button type="submit" style="background: #d81b60; color: white; padding: 8px 15px; border: none; border-radius: 4px; margin: 5px;"><i class="fas fa-save"></i> Salvar</button>
+                <button type="button" onclick="cancelEdit('profile')" style="background: #666; color: white; padding: 8px 15px; border: none; border-radius: 4px; margin: 5px;">Cancelar</button>
+            </form>
+        </div>
+
+        <div class="profile-card">
+            <h3><i class="fas fa-lock"></i> Segurança</h3>
+            <div id="password-display">
+                <p><strong>Senha:</strong> *********</p>
+                <p><strong>Tipo de Conta:</strong> Cliente</p>
+                <button onclick="editPassword()" style="background: #d81b60; color: white; padding: 8px 15px; border: none; border-radius: 4px; margin-top: 15px;"><i class="fas fa-key"></i> Alterar Senha</button>
+            </div>
+            
+            <form id="password-form" th:action="@{/perfil/edit/password}" method="post" style="display: none; margin-top: 20px;">
+                <input type="password" name="currentPassword" placeholder="Senha Atual" required style="margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                <input type="password" name="newPassword" placeholder="Nova Senha" required style="margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                <input type="password" name="confirmPassword" placeholder="Confirmar Senha" required style="margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                <button type="submit" style="background: #d81b60; color: white; padding: 8px 15px; border: none; border-radius: 4px; margin: 5px;"><i class="fas fa-save"></i> Salvar</button>
+                <button type="button" onclick="cancelEdit('password')" style="background: #666; color: white; padding: 8px 15px; border: none; border-radius: 4px; margin: 5px;">Cancelar</button>
+            </form>
+        </div>
+
+        <div class="profile-card">
+            <h3><i class="fas fa-map-marker-alt"></i> Morada</h3>
+            <div id="address-display">
+                <p th:text="${user.address} ?: 'Rua não definida'">Rua Exemplo, 123</p>
+                <p><span th:text="${user.zipCode} ?: ''"></span> <span th:text="${user.city} ?: 'Cidade não definida'"></span></p>
+                <button onclick="editAddress()" style="background: #d81b60; color: white; padding: 8px 15px; border: none; border-radius: 4px; margin-top: 15px;"><i class="fas fa-edit"></i> Editar</button>
+            </div>
+            
+            <form id="address-form" th:action="@{/perfil/edit/address}" method="post" style="display: none; margin-top: 20px;">
+                <input type="text" name="address" th:value="${user.address}" placeholder="Endereço" style="margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                <input type="text" name="city" th:value="${user.city}" placeholder="Cidade" style="margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" name="zipCode" th:value="${user.zipCode}" placeholder="Código Postal" style="margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                <button type="submit" style="background: #d81b60; color: white; padding: 8px 15px; border: none; border-radius: 4px; margin: 5px;"><i class="fas fa-save"></i> Salvar</button>
+                <button type="button" onclick="cancelEdit('address')" style="background: #666; color: white; padding: 8px 15px; border: none; border-radius: 4px; margin: 5px;">Cancelar</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<style>
+    .profile-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+    .profile-card {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    .profile-card h3 {
+        color: #d81b60;
+        margin-bottom: 20px;
+    }
+    .profile-card p {
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+    .profile-card strong {
+        color: #333;
+    }
+</style>
+
+<script>
+function editProfile() {
+    document.getElementById('profile-display').style.display = 'none';
+    document.getElementById('profile-form').style.display = 'block';
+}
+
+function editPassword() {
+    document.getElementById('password-display').style.display = 'none';
+    document.getElementById('password-form').style.display = 'block';
+}
+
+function editAddress() {
+    document.getElementById('address-display').style.display = 'none';
+    document.getElementById('address-form').style.display = 'block';
+}
+
+function cancelEdit(type) {
+    document.getElementById(type + '-display').style.display = 'block';
+    document.getElementById(type + '-form').style.display = 'none';
+}
+</script>
+
+</body>
+</html>

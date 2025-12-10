@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-PT" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brisa Pets - Relatórios de Faturação</title>
+    <!-- Incluir bibliotecas essenciais -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+    <!-- Links para estilos externos do projeto -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/reports.css">
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+    <div class="p-6">
+        <h1><i class="fas fa-heart"></i> Brisa Pets <span class="logo-sub">Admin</span></h1>
+        <nav>
+            <a href="/admin" class="sidebar-item" th:classappend="${currentPage == 'admin'} ? 'active' : ''" id="nav-dashboard">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="/reports" class="sidebar-item" th:classappend="${currentPage == 'reports'} ? 'active' : ''" id="nav-reports">
+                <i class="fas fa-file-alt"></i> Relatórios
+            </a>
+            <a href="/clientlist" class="sidebar-item" th:classappend="${currentPage == 'clientlist'} ? 'active' : ''" id="nav-clients">
+                <i class="fas fa-users"></i> Clientes
+            </a>
+            <a href="/adminCalendar" class="sidebar-item" th:classappend="${currentPage == 'adminCalendar'} ? 'active' : ''" id="nav-adminCalendar">
+                <i class="fas fa-calendar-alt"></i> Agendamentos
+            </a>
+        </nav>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="dashboard-container">
+
+        <div class="report-header">
+            <span class="report-title">Relatórios de Faturação</span>
+        </div>
+
+        <!-- SECÇÃO DE FILTROS E EXPORTAÇÃO -->
+        <div class="filter-export-section">
+
+            <div class="filter-group">
+                <label for="date-range">Intervalo de Datas</label>
+                <select id="date-range">
+                    <option value="all">Todos</option>
+                    <option value="last-30">Últimos 30 Dias</option>
+                    <option value="this-month">Este Mês</option>
+                    <option value="last-month">Mês Passado</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="service-type">Tipo de Serviço</label>
+                <select id="service-type">
+                    <option value="all">Todos</option>
+                    <option value="Banho">Banho</option>
+                    <option value="Banho e Tosquia Intima">Tosquia</option>
+                    <option value="Pet Sitting">Pet Sitting</option>
+                    <option value="Hosting">Hospedagem</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="status">Estado</label>
+                <select id="status">
+                    <option value="all">Todos</option>
+                    <option value="paid">Pago</option>
+                    <option value="pending">Pendente</option>
+                    <option value="confirmed">Confirmado</option>
+                    <option value="canceled">Cancelado</option>
+                </select>
+            </div>
+
+            <!-- Botão de pesquisa -->
+            <button class="search-button" type="button" id="search-btn">
+                <i class="fas fa-search"></i> Pesquisar
+            </button>
+
+            <!-- O botão de exportação fica à direita e alinhado ao final dos filtros -->
+            <button class="export-button" type="button" id="export-btn">
+                <i class="fas fa-file-excel"></i> Exportar Dados
+            </button>
+        </div>
+
+        <!-- GRADE DE MÉTRICAS CHAVE (Visão Geral) -->
+        <div class="metrics-grid">
+
+            <!-- Métrica 1: Receita Total (Dados do Controller) -->
+            <div class="metric-card revenue">
+                <div class="label">Receita Total</div>
+                <div class="value" th:text="${totalRevenue}">R$ 6.500,00</div>
+                <div class="trend" style="color: green;"><i class="fas fa-arrow-up"></i> +12% vs. Período Anterior</div>
+            </div>
+
+            <!-- Métrica 2: Nº de Serviços (Dados do Controller) -->
+            <div class="metric-card services">
+                <div class="label">Serviços Prestados</div>
+                <div class="value" th:text="${totalServices}">280</div>
+                <div class="trend" style="color: green;"><i class="fas fa-arrow-up"></i> +5% vs. Período Anterior</div>
+            </div>
+
+            <!-- Métrica 3: Ticket Médio (Dados do Controller) -->
+            <div class="metric-card">
+                <div class="label">Ticket Médio</div>
+                <div class="value" th:text="${avgTicket}">R$ 60,00</div>
+                <div class="trend" style="color: red;"><i class="fas fa-arrow-down"></i> -2% vs. Período Anterior</div>
+            </div>
+
+            <!-- Métrica 4: Novos Clientes (Dados do Controller) -->
+            <div class="metric-card clients">
+                <div class="label">Novos Clientes</div>
+                <div class="value" th:text="${newClients}">18</div>
+                <div class="trend" style="color: green;"><i class="fas fa-arrow-up"></i> +20% vs. Período Anterior</div>
+            </div>
+
+        </div>
+
+        <!-- SECÇÃO DE DETALHES (LISTA DE FATURAS) -->
+        <div class="details-section">
+            <h3>Detalhes da Faturação</h3>
+
+            <table class="invoices-table">
+                <thead>
+                <tr>
+                    <th>ID Fatura</th>
+                    <th>Cliente</th>
+                    <th>Data Serviço</th>
+                    <th>Valor</th>
+                    <th>Estado</th>
+                    <th>Ação</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Iteração dinâmica sobre os agendamentos -->
+                <tr th:each="appointment : ${appointments}">
+                    <td th:text="'#' + ${appointment.id}">#001</td>
+                    <td th:text="${appointment.pet.nome}">Pet Name</td>
+                    <td th:text="${#temporals.format(appointment.appointmentDateTime, 'dd/MM/yyyy')}">28/10/2025</td>
+                    <td th:text="'€ ' + ${#numbers.formatDecimal(appointment.value, 1, 2)}">€ 25,00</td>
+                    <td>
+                        <span th:if="${appointment.isPaid}" style="color: green;">Pago</span>
+                        <select th:unless="${appointment.isPaid}" class="status-select" th:data-appointment-id="${appointment.id}" th:value="${appointment.status}">
+                            <option value="Pending" th:selected="${appointment.status == 'Pending'}">Pendente</option>
+                            <option value="Confirmed" th:selected="${appointment.status == 'Confirmed'}">Confirmado</option>
+                            <option value="Canceled" th:selected="${appointment.status == 'Canceled'}">Cancelado</option>
+                        </select>
+                    </td>
+                    <td>
+                        <a href="#" class="action-link"><i class="fas fa-file-pdf"></i> Ver</a>
+                        <a href="#" class="action-link edit-link" th:data-appointment-id="${appointment.id}"><i class="fas fa-edit"></i> Editar</a>
+                        <a href="#" class="action-link delete-link" th:data-appointment-id="${appointment.id}" style="color: #dc3545;"><i class="fas fa-trash"></i> Apagar</a>
+                    </td>
+                </tr>
+                <!-- Mensagem quando não há agendamentos -->
+                <tr th:if="${#lists.isEmpty(appointments)}">
+                    <td colspan="6" style="text-align: center; color: #666;">Nenhum agendamento encontrado</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- Edit Appointment Modal -->
+<div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; width: 500px; max-width: 90%;">
+        <h3>Editar Agendamento</h3>
+        <form id="editForm">
+            <input type="hidden" id="editId">
+            <div style="margin-bottom: 15px;">
+                <label>Cliente:</label>
+                <input type="text" id="editClient" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; background: #f5f5f5;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Serviço:</label>
+                <select id="editService" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                    <option value="Banho">Banho</option>
+                    <option value="Banho e Tosquia Intima">Banho e Tosquia Íntima</option>
+                    <option value="Banho e Tosquia Geral">Banho e Tosquia Geral</option>
+                    <option value="Pet Sitting">Pet Sitting</option>
+                    <option value="Hosting">Hosting</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Data:</label>
+                <input type="datetime-local" id="editDateTime" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Valor (€):</label>
+                <input type="number" id="editValue" step="0.01" min="0" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Estado:</label>
+                <select id="editStatus" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                    <option value="Pending">Pendente</option>
+                    <option value="Confirmed">Confirmado</option>
+                    <option value="Canceled">Cancelado</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" onclick="closeEditModal()" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px;">Cancelar</button>
+                <button type="submit" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px;">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateRangeFilter = document.getElementById('date-range');
+    const serviceTypeFilter = document.getElementById('service-type');
+    const statusFilter = document.getElementById('status');
+    const exportBtn = document.getElementById('export-btn');
+    
+    const searchBtn = document.getElementById('search-btn');
+    
+    // Search button handler
+    searchBtn.addEventListener('click', applyFilters);
+    
+    // Status dropdown change handler
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('status-select')) {
+            updateAppointmentStatus(e.target.dataset.appointmentId, e.target.value);
+        }
+    });
+    
+    // Export button handler
+    exportBtn.addEventListener('click', exportData);
+    
+    // Edit and Delete link handlers
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.edit-link')) {
+            e.preventDefault();
+            const appointmentId = e.target.closest('.edit-link').dataset.appointmentId;
+            openEditModal(appointmentId);
+        }
+        
+        if (e.target.closest('.delete-link')) {
+            e.preventDefault();
+            const appointmentId = e.target.closest('.delete-link').dataset.appointmentId;
+            if (confirm('Tem certeza que deseja apagar este agendamento?')) {
+                deleteAppointment(appointmentId);
+            }
+        }
+    });
+    
+    function applyFilters() {
+        const params = new URLSearchParams({
+            dateRange: dateRangeFilter.value,
+            serviceType: serviceTypeFilter.value,
+            status: statusFilter.value
+        });
+        
+        // Show loading state
+        searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pesquisando...';
+        searchBtn.disabled = true;
+        
+        fetch(`/admin/reports/search?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                updateMetrics(data.metrics);
+                updateTable(data.appointments);
+            })
+            .catch(error => {
+                console.error('Error applying filters:', error);
+                alert('Erro ao pesquisar. Tente novamente.');
+            })
+            .finally(() => {
+                searchBtn.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
+                searchBtn.disabled = false;
+            });
+    }
+    
+    function updateAppointmentStatus(appointmentId, newStatus) {
+        fetch(`/admin/appointments/${appointmentId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Status updated successfully');
+                applyFilters(); // Refresh data
+            } else {
+                console.error('Failed to update status');
+            }
+        })
+        .catch(error => console.error('Error updating status:', error));
+    }
+    
+    function exportData() {
+        const params = new URLSearchParams({
+            dateRange: dateRangeFilter.value,
+            serviceType: serviceTypeFilter.value,
+            status: statusFilter.value
+        });
+        
+        window.location.href = `/admin/reports/export?${params}`;
+    }
+    
+    function openEditModal(appointmentId) {
+        fetch(`/admin/appointments/${appointmentId}`)
+            .then(response => response.json())
+            .then(appointment => {
+                document.getElementById('editId').value = appointment.id;
+                document.getElementById('editClient').value = appointment.petName;
+                document.getElementById('editService').value = appointment.serviceName;
+                document.getElementById('editDateTime').value = appointment.dateTimeForInput;
+                document.getElementById('editValue').value = appointment.value;
+                document.getElementById('editStatus').value = appointment.status;
+                document.getElementById('editModal').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error loading appointment:', error);
+                alert('Erro ao carregar dados do agendamento');
+            });
+    }
+    
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+    
+    // Edit form submission
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const appointmentId = document.getElementById('editId').value;
+        const formData = {
+            serviceName: document.getElementById('editService').value,
+            appointmentDateTime: document.getElementById('editDateTime').value,
+            value: parseFloat(document.getElementById('editValue').value),
+            status: document.getElementById('editStatus').value
+        };
+        
+        fetch(`/admin/appointments/${appointmentId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (response.ok) {
+                closeEditModal();
+                applyFilters(); // Refresh data
+                alert('Agendamento atualizado com sucesso!');
+            } else {
+                alert('Erro ao atualizar agendamento');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating appointment:', error);
+            alert('Erro ao atualizar agendamento');
+        });
+    });
+    
+    function deleteAppointment(appointmentId) {
+        console.log('Attempting to delete appointment:', appointmentId);
+        
+        fetch(`/admin/appointments/${appointmentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('Delete response status:', response.status);
+            if (response.ok) {
+                alert('Agendamento apagado com sucesso!');
+                // Reload the page to refresh data
+                window.location.reload();
+            } else {
+                response.text().then(text => {
+                    console.error('Delete failed:', text);
+                    alert('Erro ao apagar agendamento: ' + response.status);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting appointment:', error);
+            alert('Erro de rede ao apagar agendamento');
+        });
+    }
+    
+    function updateMetrics(metrics) {
+        document.querySelector('.metric-card.revenue .value').textContent = metrics.totalRevenue;
+        document.querySelector('.metric-card.services .value').textContent = metrics.totalServices;
+        document.querySelector('.metric-card:nth-child(3) .value').textContent = metrics.avgTicket;
+        document.querySelector('.metric-card.clients .value').textContent = metrics.newClients;
+    }
+    
+    function updateTable(appointments) {
+        const tbody = document.querySelector('.invoices-table tbody');
+        tbody.innerHTML = '';
+        
+        if (appointments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">Nenhum agendamento encontrado</td></tr>';
+            return;
+        }
+        
+        appointments.forEach(appointment => {
+            const row = document.createElement('tr');
+            const statusCell = appointment.isPaid ? 
+                `<span style="color: green;">Pago</span>` :
+                `<select class="status-select" data-appointment-id="${appointment.id}">
+                    <option value="Pending" ${appointment.status === 'Pending' ? 'selected' : ''}>Pendente</option>
+                    <option value="Confirmed" ${appointment.status === 'Confirmed' ? 'selected' : ''}>Confirmado</option>
+                    <option value="Canceled" ${appointment.status === 'Canceled' ? 'selected' : ''}>Cancelado</option>
+                </select>`;
+            
+            row.innerHTML = `
+                <td>#${appointment.id}</td>
+                <td>${appointment.petName}</td>
+                <td>${appointment.formattedDate}</td>
+                <td>€ ${appointment.value.toFixed(2)}</td>
+                <td>${statusCell}</td>
+                <td>
+                    <a href="#" class="action-link"><i class="fas fa-file-pdf"></i> Ver</a>
+                    <a href="#" class="action-link edit-link" data-appointment-id="${appointment.id}"><i class="fas fa-edit"></i> Editar</a>
+                    <a href="#" class="action-link delete-link" data-appointment-id="${appointment.id}" style="color: #dc3545;"><i class="fas fa-trash"></i> Apagar</a>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+});
+</script>
+
+</body>
+</html>

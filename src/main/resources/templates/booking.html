@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-PT" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brisa Pets - Agendar Serviço</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/booking.css"> </head>
+<body>
+
+<header class="header">
+    <div class="logo-container">
+        <i class="fas fa-heart logo-icon"></i>
+        <span class="logo-name">Brisa Pets</span>
+        <span class="logo-slogan">Cuidados com amor</span>
+    </div>
+    <nav class="nav-menu-internal">
+        <a href="/pets" class="nav-link-icon"><i class="fas fa-paw"></i> Meus Pets</a>
+        <a href="/agendar" class="nav-link-icon active"><i class="fas fa-calendar-alt"></i> Agendar Serviço</a>
+        <a href="/appointments" class="nav-link-icon"><i class="fas fa-list-alt"></i> Meus Agendamentos</a>
+        <a href="/hospedagem" class="nav-link-icon"><i class="fas fa-bed"></i> Hospedagem</a>
+        <a href="/perfil" class="nav-link-icon"><i class="fas fa-user-circle"></i> Perfil</a>
+        <a href="/logout" class="nav-link-icon sair"><i class="fas fa-sign-out-alt"></i> Sair</a>
+    </nav>
+</header>
+
+<section class="section-padded">
+    <div class="section-tag-small internal-tag">Agendamento</div>
+    <h2 class="section-title">Agendar Serviços</h2>
+    <p class="section-subtitle">
+        Escolha o melhor horário para cuidar do seu companheiro. Oferecemos
+        serviços profissionais com todo o carinho que ele merece.
+    </p>
+
+    <form th:action="@{/agendar/save}" method="post" id="appointmentForm">
+
+        <div th:if="${error}" class="alert alert-danger" role="alert" style="margin-bottom: 20px;">
+            <p th:text="${error}"></p>
+        </div>
+
+        <div class="appointment-grid">
+
+            <div class="services-list-container">
+                <h3 class="subsection-title">Nossos Serviços</h3>
+
+                <div class="form-group mb-4">
+                    <label for="petId" class="subsection-title">Para qual Pet é o serviço?</label>
+                    <select id="petId" name="petId" class="form-control" required>
+                        <option value="">Selecione um Pet</option>
+                        <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.nome}"></option>
+                    </select>
+                    <p th:if="${pets.isEmpty()}" class="text-danger mt-2">⚠️ Você precisa cadastrar um Pet para agendar um serviço! Vá para <a th:href="@{/pets}">Meus Pets</a>.</p>
+                </div>
+
+                <div class="service-option" data-service-name="Banho">
+                    <div class="service-icon-circle"><i class="fas fa-bath"></i></div>
+                    <div class="service-details">
+                        <h4>Banho</h4>
+                        <p>Banho relaxante com produtos premium, secagem e escovagem profissional</p>
+                        <div class="service-meta">
+                            <span><i class="fas fa-clock"></i> 45-60 min</span>
+                            <span class="price-tag">25€</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-option" data-service-name="Banho e Tosquia Intima">
+                    <div class="service-icon-circle"><i class="fas fa-cut"></i></div>
+                    <div class="service-details">
+                        <h4>Banho e Tosquia Íntima</h4>
+                        <span class="popular-tag">Popular</span>
+                        <p>Banho completo + tosquia higiénica com cuidado especial</p>
+                        <div class="service-meta">
+                            <span><i class="fas fa-clock"></i> 60-90 min</span>
+                            <span class="price-tag bold-value">35€</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-option" data-service-name="Banho e Tosquia Geral">
+                    <div class="service-icon-circle"><i class="fas fa-star"></i></div>
+                    <div class="service-details">
+                        <h4>Banho e Tosquia Geral</h4>
+                        <p>Pacote completo com banho e tosquia geral adaptada à raça</p>
+                        <div class="service-meta">
+                            <span><i class="fas fa-clock"></i> 90-120 min</span>
+                            <span class="price-tag bold-value">50€</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-option" data-service-name="Pet Sitting">
+                    <div class="service-icon-circle"><i class="fas fa-home"></i></div>
+                    <div class="service-details">
+                        <h4>Pet Sitting</h4>
+                        <p>Cuidado personalizado do seu pet na sua própria casa</p>
+                        <div class="service-meta">
+                            <span><i class="fas fa-calendar"></i> Por período</span>
+                            <span class="price-tag bold-value">30€/dia</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-option" data-service-name="Hosting">
+                    <div class="service-icon-circle"><i class="fas fa-bed"></i></div>
+                    <div class="service-details">
+                        <h4>Hosting</h4>
+                        <p>Hospedagem completa do seu pet nas nossas instalações</p>
+                        <div class="service-meta">
+                            <span><i class="fas fa-calendar"></i> Por período</span>
+                            <span class="price-tag bold-value">40€/dia</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="schedule-container">
+                <h3 class="subsection-title">Selecionar Horário</h3>
+
+                <div class="date-time-box">
+                    <h4 class="box-title" id="dateTimeTitle"><i class="fas fa-calendar-alt"></i> Escolher Data e Hora</h4>
+
+                    <div class="calendar-header">
+                        <a th:href="@{/agendar(year=${prevMonthYear}, month=${prevMonth})}">
+                            <button type="button" class="nav-button"><i class="fas fa-chevron-left"></i></button>
+                        </a>
+
+                        <div class="month-year" th:text="${#temporals.format(currentYearMonth.atDay(1), 'MMMM yyyy')}"></div>
+
+                        <a th:href="@{/agendar(year=${nextMonthYear}, month=${nextMonth})}">
+                            <button type="button" class="nav-button"><i class="fas fa-chevron-right"></i></button>
+                        </a>
+                    </div>
+
+                    <div class="calendar-grid" id="calendarGrid">
+                        <span class="day-name">Dom</span>
+                        <span class="day-name">Seg</span>
+                        <span class="day-name">Ter</span>
+                        <span class="day-name">Qua</span>
+                        <span class="day-name">Qui</span>
+                        <span class="day-name">Sex</span>
+                        <span class="day-name">Sáb</span>
+
+                        <th:block th:each="day : ${calendarDays}">
+                            <span th:if="${day == null}"></span>
+
+                            <th:block th:if="${day != null}">
+
+                                <span
+                                        th:class="${currentYearMonth.atDay(day).isBefore(currentDate) ? 'day-number inactive' : 'day-number'}"
+                                        th:attr="data-date-value=${currentYearMonth.atDay(day)}"
+                                        th:text="${day}">
+                                </span>
+                            </th:block>
+                        </th:block>
+                    </div>
+
+                    <h4 class="horarios-title">Horários Disponíveis</h4>
+                    <div class="time-slots" id="timeSlots">
+                        <button type="button" class="time-slot active-time" data-time-value="09:00">09:00</button>
+                        <button type="button" class="time-slot active-time" data-time-value="10:00">10:00</button>
+                        <button type="button" class="time-slot active-time" data-time-value="11:00">11:00</button>
+                        <button type="button" class="time-slot active-time" data-time-value="14:00">14:00</button>
+                        <button type="button" class="time-slot active-time" data-time-value="15:00">15:00</button>
+                        <button type="button" class="time-slot active-time" data-time-value="16:00">16:00</button>
+                        <button type="button" class="time-slot active-time" data-time-value="17:00">17:00</button>
+                    </div>
+
+                    <!-- Date range fields for Pet Sitting and Hosting -->
+                    <div class="date-range-container" id="dateRangeContainer" style="display: none;">
+                        <div class="date-range-inputs">
+                            <div class="date-input-group">
+                                <label for="startDate">Data de Início:</label>
+                                <input type="date" id="startDate" name="startDate" class="form-control" />
+                            </div>
+                            <div class="date-input-group">
+                                <label for="endDate">Data de Fim:</label>
+                                <input type="date" id="endDate" name="endDate" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observations field for Pet Sitting and Hosting -->
+                    <div class="observations-container" id="observationsContainer" style="display: none;">
+                        <label for="observations">Observações (opcional):</label>
+                        <textarea id="observations" name="observations" class="form-control" rows="3" placeholder="Informações adicionais sobre o seu pet ou preferências especiais..."></textarea>
+                    </div>
+
+                    <input type="hidden" id="serviceName" name="serviceName" value="" />
+                    <input type="hidden" id="selectedDate" name="selectedDate" value="" />
+                    <input type="hidden" id="selectedTime" name="selectedTime" value="" />
+
+
+                    <button type="submit" class="btn btn-confirm-appointment" id="confirmAppointmentBtn" disabled>
+                        <i class="fas fa-calendar-check"></i> <span id="confirmButtonText">Confirmar Agendamento</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+<script src="js/booking.js">
+</script>
+</body>
+</html>

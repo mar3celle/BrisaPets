@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-PT" xmlns:th="www.thymeleaf.org">
+<head xmlns:th="http://www.w3.org/1999/xhtml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brisa Pets - Entrar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="auth-body">
+
+<div class="login-container">
+
+    <div class="auth-header">
+        <a href="/" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="logo-auth">
+            <i class="fas fa-heart logo-icon-sm"></i>
+            <span>Brisa Pets</span>
+        </div>
+    </div>
+
+    <div class="auth-card">
+        <h2 class="auth-title">Bem-vindo</h2>
+        <p class="auth-subtitle">Entre na sua conta ou crie uma nova para começar</p>
+
+        <div class="tab-navigation">
+            <button class="tab-btn active" id="tab-entrar">Entrar</button>
+            <button class="tab-btn" id="tab-registro">Criar Conta</button>
+        </div>
+
+        <form th:action="@{/perform_login}" method="POST" class="form-auth" id="login-form">
+
+            <div th:if="${param.error}" class="alert-error" style="color: darkred; margin-bottom: 15px; padding: 10px; border: 1px solid darkred; border-radius: 4px;">
+                Email ou senha inválidos.
+            </div>
+            <div th:if="${param.logout}" class="alert-success" style="color: green; margin-bottom: 15px; padding: 10px; border: 1px solid green; border-radius: 4px;">
+                Sessão encerrada com sucesso.
+            </div>
+            <p th:if="${registrationSuccess}" class="alert-success" style="color: green; font-weight: 600; margin-top: 15px; margin-bottom: 20px;" th:text="${registrationSuccess}"></p>
+
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="username" class="input-light-blue" required>
+
+            <label for="password">Senha</label>
+            <input type="password" id="password" name="password" class="input-light-blue" required>
+
+            <button type="submit" class="btn btn-submit">Entrar na Conta</button>
+        </form>
+
+        <div class="divider">
+            <span>ou</span>
+        </div>
+
+        <a href="/oauth2/authorization/google" class="btn btn-google">
+            <i class="fab fa-google"></i>
+            Entrar com Google
+        </a>
+
+
+        <form th:action="@{/register}" th:object="${user}" method="POST" class="auth-form hidden" id="registro-form">
+
+            <div th:if="${#fields.hasAnyErrors()}" class="alert-error" style="color: darkred; margin-bottom: 15px; padding: 10px; border: 1px solid darkred; border-radius: 4px;">
+                Corrija os erros abaixo.
+            </div>
+
+            <label for="reg-primeiro-nome">Primeiro Nome</label>
+            <input type="text" id="reg-primeiro-nome" th:field="*{firstName}" class="input-light-blue" required>
+            <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="text-danger" style="color: red; font-size: 0.9em;"></p>
+
+            <label for="reg-ultimo-nome">Último Nome</label>
+            <input type="text" id="reg-ultimo-nome" th:field="*{lastName}" class="input-light-blue" required>
+            <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="text-danger" style="color: red; font-size: 0.9em;"></p>
+
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" th:field="*{email}" class="input-light-blue" required>
+            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger" style="color: red; font-size: 0.9em;"></p>
+
+            <label for="reg-senha">Senha</label>
+            <input type="password" id="reg-senha" th:field="*{password}" class="input-light-blue" required>
+            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-danger" style="color: red; font-size: 0.9em;"></p>
+
+            <label for="reg-confirma-senha">Confirmar Senha</label>
+            <input type="password" id="reg-confirma-senha" name="confirmPassword" class="input-light-blue" required>
+
+            <button type="submit" class="btn btn-submit">Criar Conta</button>
+        </form>
+
+    </div>
+</div>
+<script src="/js/auth.js"></script>
+</body>
+</html>
