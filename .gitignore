@@ -33,3 +33,7 @@ build/
 
 ### Local Configuration ###
 application-local.properties
+
+### Build artifacts ###
+target/
+*.class
