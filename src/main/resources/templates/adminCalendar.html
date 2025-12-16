@@ -34,7 +34,6 @@
     <div class="main-wrapper">
         <h1 id="page-title">Gestão de Agendamentos</h1>
         
-        <!-- Success/Error Messages -->
         <div th:if="${adminMessage}" class="alert alert-success" style="background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
             <span th:text="${adminMessage}"></span>
         </div>
@@ -45,9 +44,17 @@
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3>Calendário de Agendamentos</h3>
-                <button onclick="showAppointmentForm()" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Novo Agendamento
-                </button>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="generateReport('pdf')" class="btn" style="background: #dc3545; color: white;">
+                        <i class="fas fa-file-pdf"></i> Gerar PDF
+                    </button>
+                    <button onclick="generateReport('excel')" class="btn" style="background: #28a745; color: white;">
+                        <i class="fas fa-file-excel"></i> Gerar Excel
+                    </button>
+                    <button onclick="showAppointmentForm()" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Novo Agendamento
+                    </button>
+                </div>
             </div>
             
             <div class="calendar-header">
@@ -91,273 +98,310 @@
                 </th:block>
             </div>
             
-            <div id="appointment-form" style="display: none; margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                <h4>Novo Agendamento</h4>
-                <form action="/admin/appointment/save" method="post">
-                    <div id="single-date-fields">
-                        <div style="margin-bottom: 15px;">
-                            <label>Data Selecionada:</label>
-                            <input type="text" id="selected-date-display" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            <input type="hidden" id="selected-date" name="selectedDate">
-                        </div>
+            <div id="appointment-form" style="display: none; margin-top: 20px;">
+                <div class="appointment-grid">
+                    <div class="services-list-container">
+                        <h3 class="subsection-title">Selecionar Serviço</h3>
                         
-                        <div style="margin-bottom: 15px;">
-                            <label>Horário:</label>
-                            <div class="time-slots" id="timeSlots">
-                                <button type="button" class="time-slot" data-time-value="09:00">09:00</button>
-                                <button type="button" class="time-slot" data-time-value="10:00">10:00</button>
-                                <button type="button" class="time-slot" data-time-value="11:00">11:00</button>
-                                <button type="button" class="time-slot" data-time-value="14:00">14:00</button>
-                                <button type="button" class="time-slot" data-time-value="15:00">15:00</button>
-                                <button type="button" class="time-slot" data-time-value="16:00">16:00</button>
-                                <button type="button" class="time-slot" data-time-value="17:00">17:00</button>
+                        <div class="service-option" data-service-name="Banho" data-price="25">
+                            <div class="service-icon-circle"><i class="fas fa-bath"></i></div>
+                            <div class="service-details">
+                                <h4>Banho</h4>
+                                <p>Banho relaxante com produtos premium</p>
+                                <div class="service-meta">
+                                    <span><i class="fas fa-clock"></i> 45-60 min</span>
+                                    <span class="price-tag editable" data-service="Banho" contenteditable="true">25€</span>
+                                </div>
                             </div>
-                            <input type="hidden" id="selected-time" name="selectedTime">
+                        </div>
+
+                        <div class="service-option" data-service-name="Banho e Tosquia Intima" data-price="35">
+                            <div class="service-icon-circle"><i class="fas fa-cut"></i></div>
+                            <div class="service-details">
+                                <h4>Banho e Tosquia Íntima</h4>
+                                <p>Banho completo + tosquia higiénica</p>
+                                <div class="service-meta">
+                                    <span><i class="fas fa-clock"></i> 60-90 min</span>
+                                    <span class="price-tag editable" data-service="Banho e Tosquia Intima" contenteditable="true">35€</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-option" data-service-name="Banho e Tosquia Geral" data-price="50">
+                            <div class="service-icon-circle"><i class="fas fa-star"></i></div>
+                            <div class="service-details">
+                                <h4>Banho e Tosquia Geral</h4>
+                                <p>Pacote completo com tosquia adaptada à raça</p>
+                                <div class="service-meta">
+                                    <span><i class="fas fa-clock"></i> 90-120 min</span>
+                                    <span class="price-tag editable" data-service="Banho e Tosquia Geral" contenteditable="true">50€</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-option" data-service-name="Pet Sitting" data-price="30">
+                            <div class="service-icon-circle"><i class="fas fa-home"></i></div>
+                            <div class="service-details">
+                                <h4>Pet Sitting</h4>
+                                <p>Cuidado personalizado na casa do cliente</p>
+                                <div class="service-meta">
+                                    <span><i class="fas fa-calendar"></i> Por período</span>
+                                    <span class="price-tag editable" data-service="Pet Sitting" contenteditable="true">30€/dia</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-option" data-service-name="Hosting" data-price="40">
+                            <div class="service-icon-circle"><i class="fas fa-bed"></i></div>
+                            <div class="service-details">
+                                <h4>Hosting</h4>
+                                <p>Hospedagem nas nossas instalações</p>
+                                <div class="service-meta">
+                                    <span><i class="fas fa-calendar"></i> Por período</span>
+                                    <span class="price-tag editable" data-service="Hosting" contenteditable="true">40€/dia</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <div style="margin-bottom: 15px;">
-                        <label>Pet:</label>
-                        <select name="petId" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
-                            <option value="">Selecione um Pet</option>
-                            <option th:each="pet : ${allPets}" th:value="${pet.id}" th:text="${pet.nome + ' (' + pet.tutorId + ')'}"></option>
-                        </select>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label>Serviço:</label>
-                        <select id="service-select" name="serviceName" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
-                            <option value="">Selecione um Serviço</option>
-                            <option value="Banho">Banho - €25</option>
-                            <option value="Banho e Tosquia Intima">Banho e Tosquia Íntima - €35</option>
-                            <option value="Banho e Tosquia Geral">Banho e Tosquia Geral - €50</option>
-                            <option value="Pet Sitting">Pet Sitting - €30/dia</option>
-                            <option value="Hosting">Hosting - €40/dia</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Date range display for Pet Sitting and Hosting -->
-                    <div id="date-range-display" style="display: none; margin-bottom: 15px;">
-                        <div style="display: flex; gap: 15px; align-items: center;">
-                            <div style="flex: 1;">
-                                <label>Período Selecionado:</label>
-                                <div id="selected-range-text" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; min-height: 20px;">Selecione as datas no calendário</div>
+                    <div class="schedule-container">
+                        <form action="/admin/appointment/save" method="post" id="admin-appointment-form">
+                            <h3 class="subsection-title">Detalhes do Agendamento</h3>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label><strong>Pet:</strong></label>
+                                <input type="text" id="pet-search" placeholder="Digite o nome do pet..." style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; margin-bottom: 10px;">
+                                <div id="pet-results" style="max-height: 150px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; display: none;"></div>
+                                <input type="hidden" id="selected-pet-id" name="petId" required>
+                                <div id="selected-pet-display" style="padding: 8px; background: #f8f9fa; border-radius: 4px; display: none;"></div>
                             </div>
-                            <button type="button" id="clear-range-btn" class="btn" style="background: #6c757d; color: white; padding: 8px 12px;">Limpar</button>
-                        </div>
-                        <input type="hidden" id="start-date" name="startDate">
-                        <input type="hidden" id="end-date" name="endDate">
+                            
+                            <div id="single-date-section">
+                                <div style="margin-bottom: 15px;">
+                                    <label><strong>Data:</strong></label>
+                                    <input type="date" id="selected-date" name="selectedDate" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                                </div>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <label><strong>Horário:</strong></label>
+                                    <div class="time-slots" id="timeSlots">
+                                        <button type="button" class="time-slot" data-time-value="09:00">09:00</button>
+                                        <button type="button" class="time-slot" data-time-value="10:00">10:00</button>
+                                        <button type="button" class="time-slot" data-time-value="11:00">11:00</button>
+                                        <button type="button" class="time-slot" data-time-value="14:00">14:00</button>
+                                        <button type="button" class="time-slot" data-time-value="15:00">15:00</button>
+                                        <button type="button" class="time-slot" data-time-value="16:00">16:00</button>
+                                    </div>
+                                    <input type="hidden" id="selected-time" name="selectedTime">
+                                </div>
+                            </div>
+                            
+                            <div id="date-range-section" style="display: none;">
+                                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                                    <div style="flex: 1;">
+                                        <label><strong>Data Início:</strong></label>
+                                        <input type="date" id="start-date" name="startDate" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label><strong>Data Fim:</strong></label>
+                                        <input type="date" id="end-date" name="endDate" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <label><strong>Observações:</strong></label>
+                                    <textarea name="observations" rows="3" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; resize: vertical;" placeholder="Informações adicionais..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <input type="hidden" id="service-name" name="serviceName">
+                            <input type="hidden" id="service-price" name="servicePrice">
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button type="submit" class="btn btn-primary" id="save-appointment" disabled>
+                                    <i class="fas fa-save"></i> Salvar Agendamento
+                                </button>
+                                <button type="button" onclick="hideAppointmentForm()" class="btn" style="background: #6c757d; color: white;">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    
-                    <!-- Observations field -->
-                    <div id="observations-field" style="display: none; margin-bottom: 15px;">
-                        <label>Observações (opcional):</label>
-                        <textarea name="observations" rows="3" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; resize: vertical;" placeholder="Informações adicionais sobre o pet ou preferências especiais..."></textarea>
-                    </div>
-                    
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" class="btn btn-primary" id="submit-btn">Criar Agendamento</button>
-                        <button type="button" class="btn" onclick="hideAppointmentForm()" style="background: #6c757d; color: white;">Cancelar</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        function showAppointmentForm() {
-            document.getElementById('appointment-form').style.display = 'block';
-        }
-        
-        function hideAppointmentForm() {
-            document.getElementById('appointment-form').style.display = 'none';
-            // Reset form
-            document.querySelectorAll('.day-number').forEach(d => {
-                d.classList.remove('selected', 'range-start', 'range-end', 'in-range');
-            });
-            document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
-            document.getElementById('selected-date-display').value = '';
-            document.getElementById('selected-date').value = '';
-            document.getElementById('selected-time').value = '';
-            document.getElementById('start-date').value = '';
-            document.getElementById('end-date').value = '';
-            document.getElementById('service-select').value = '';
-            document.getElementById('selected-range-text').textContent = 'Selecione as datas no calendário';
-            document.getElementById('single-date-fields').style.display = 'block';
-            document.getElementById('date-range-display').style.display = 'none';
-            document.getElementById('observations-field').style.display = 'none';
-        }
-        
-        // Day selection
-        document.addEventListener('DOMContentLoaded', function() {
-            const serviceSelect = document.getElementById('service-select');
-            const singleDateFields = document.getElementById('single-date-fields');
-            const dateRangeDisplay = document.getElementById('date-range-display');
-            const observationsField = document.getElementById('observations-field');
-            const startDateInput = document.getElementById('start-date');
-            const endDateInput = document.getElementById('end-date');
-            const selectedRangeText = document.getElementById('selected-range-text');
-            const clearRangeBtn = document.getElementById('clear-range-btn');
-            const submitBtn = document.getElementById('submit-btn');
+<script>
+// Admin Calendar JavaScript
+let allPets = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadPets();
+    initServiceSelection();
+    initTimeSlots();
+    initPetSearch();
+});
+
+function loadPets() {
+    fetch('/api/pets/all')
+        .then(response => response.json())
+        .then(data => {
+            allPets = data;
+        })
+        .catch(error => console.error('Erro ao carregar pets:', error));
+}
+
+function initServiceSelection() {
+    const serviceOptions = document.querySelectorAll('.service-option');
+    
+    serviceOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            serviceOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
             
-            let isDateRangeMode = false;
-            let rangeStartDate = null;
-            let rangeEndDate = null;
+            const serviceName = this.getAttribute('data-service-name');
+            const isRangeService = serviceName === 'Pet Sitting' || serviceName === 'Hosting';
             
-            // Service selection handler
-            serviceSelect.addEventListener('change', function() {
-                isDateRangeMode = this.value === 'Pet Sitting' || this.value === 'Hosting';
-                clearSelection();
-                
-                if (isDateRangeMode) {
-                    singleDateFields.style.display = 'none';
-                    dateRangeDisplay.style.display = 'block';
-                    observationsField.style.display = 'block';
-                } else {
-                    singleDateFields.style.display = 'block';
-                    dateRangeDisplay.style.display = 'none';
-                    observationsField.style.display = 'none';
-                }
-                updateSubmitButton();
-            });
+            document.getElementById('service-name').value = serviceName;
+            document.getElementById('service-price').value = this.getAttribute('data-price');
             
-            // Clear range selection
-            clearRangeBtn.addEventListener('click', function() {
-                clearSelection();
-            });
-            
-            function clearSelection() {
-                rangeStartDate = null;
-                rangeEndDate = null;
-                
-                document.querySelectorAll('.day-number').forEach(d => {
-                    d.classList.remove('selected', 'range-start', 'range-end', 'in-range');
-                });
-                
-                startDateInput.value = '';
-                endDateInput.value = '';
-                selectedRangeText.textContent = 'Selecione as datas no calendário';
-                document.getElementById('selected-date').value = '';
-                document.getElementById('selected-time').value = '';
-                updateSubmitButton();
+            if (isRangeService) {
+                document.getElementById('single-date-section').style.display = 'none';
+                document.getElementById('date-range-section').style.display = 'block';
+            } else {
+                document.getElementById('single-date-section').style.display = 'block';
+                document.getElementById('date-range-section').style.display = 'none';
             }
             
-            function updateRangeDisplay() {
-                if (rangeStartDate && rangeEndDate) {
-                    const start = new Date(rangeStartDate).toLocaleDateString('pt-PT');
-                    const end = new Date(rangeEndDate).toLocaleDateString('pt-PT');
-                    selectedRangeText.textContent = start === end ? start : `${start} - ${end}`;
-                    startDateInput.value = rangeStartDate;
-                    endDateInput.value = rangeEndDate;
-                } else if (rangeStartDate) {
-                    selectedRangeText.textContent = new Date(rangeStartDate).toLocaleDateString('pt-PT') + ' (selecione data final)';
-                    startDateInput.value = rangeStartDate;
-                }
-                updateSubmitButton();
-            }
-            
-            function updateSubmitButton() {
-                if (isDateRangeMode) {
-                    submitBtn.disabled = !rangeStartDate || !serviceSelect.value;
-                } else {
-                    const hasDate = document.getElementById('selected-date').value;
-                    const hasTime = document.getElementById('selected-time').value;
-                    submitBtn.disabled = !hasDate || !hasTime || !serviceSelect.value;
-                }
-            }
-            
-            function highlightRange() {
-                document.querySelectorAll('.day-number').forEach(day => {
-                    day.classList.remove('in-range');
-                    const dayDate = day.getAttribute('data-date-value');
-                    
-                    if (rangeStartDate && rangeEndDate && dayDate >= rangeStartDate && dayDate <= rangeEndDate) {
-                        day.classList.add('in-range');
-                    }
-                });
-                
-                // Check availability for the selected range
-                if (rangeStartDate && rangeEndDate && isDateRangeMode) {
-                    checkRangeAvailability(rangeStartDate, rangeEndDate);
-                }
-            }
-            
-            function checkRangeAvailability(startDate, endDate) {
-                fetch(`/api/admin/availability/range?startDate=${startDate}&endDate=${endDate}`)
-                    .then(response => response.json())
-                    .then(isAvailable => {
-                        const rangeText = document.getElementById('selected-range-text');
-                        if (!isAvailable) {
-                            rangeText.style.color = '#dc3545';
-                            rangeText.style.fontWeight = 'bold';
-                            document.querySelectorAll('.in-range, .range-start, .range-end').forEach(day => {
-                                day.style.backgroundColor = '#f8d7da';
-                                day.style.color = '#721c24';
-                            });
-                        } else {
-                            rangeText.style.color = '';
-                            rangeText.style.fontWeight = '';
-                            document.querySelectorAll('.in-range, .range-start, .range-end').forEach(day => {
-                                day.style.backgroundColor = '';
-                                day.style.color = '';
-                            });
-                        }
-                    })
-                    .catch(error => console.error('Error checking availability:', error));
-            }
-            
-            // Day click handler
-            document.querySelectorAll('.day-number').forEach(day => {
-                day.addEventListener('click', function() {
-                    if (this.classList.contains('day-disabled')) return;
-                    
-                    const dateValue = this.getAttribute('data-date-value');
-                    
-                    if (isDateRangeMode) {
-                        if (!rangeStartDate || (rangeStartDate && rangeEndDate)) {
-                            // Start new selection
-                            clearSelection();
-                            rangeStartDate = dateValue;
-                            this.classList.add('range-start');
-                        } else if (rangeStartDate && !rangeEndDate) {
-                            // Complete the range
-                            if (dateValue >= rangeStartDate) {
-                                rangeEndDate = dateValue;
-                                this.classList.add('range-end');
-                            } else {
-                                // Swap if end is before start
-                                rangeEndDate = rangeStartDate;
-                                rangeStartDate = dateValue;
-                                document.querySelector('.range-start').classList.remove('range-start');
-                                this.classList.add('range-start');
-                                document.querySelector(`[data-date-value="${rangeEndDate}"]`).classList.add('range-end');
-                            }
-                            highlightRange();
-                        }
-                        updateRangeDisplay();
-                    } else {
-                        // Single date selection
-                        document.querySelectorAll('.day-number').forEach(d => d.classList.remove('selected'));
-                        this.classList.add('selected');
-                        document.getElementById('selected-date').value = dateValue;
-                        document.getElementById('selected-date-display').value = new Date(dateValue).toLocaleDateString('pt-PT');
-                        updateSubmitButton();
-                    }
-                });
-            });
-            
-            // Time selection
-            document.querySelectorAll('.time-slot').forEach(slot => {
-                slot.addEventListener('click', function() {
-                    document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
-                    this.classList.add('selected');
-                    document.getElementById('selected-time').value = this.getAttribute('data-time-value');
-                    updateSubmitButton();
-                });
-            });
-            
-            updateSubmitButton();
+            validateForm();
         });
-    </script>
+    });
+    
+    // Preços editáveis
+    const editablePrices = document.querySelectorAll('.price-tag.editable');
+    editablePrices.forEach(price => {
+        price.addEventListener('blur', function() {
+            const service = this.getAttribute('data-service');
+            const newPrice = this.textContent.replace('€', '').replace('/dia', '');
+            console.log(`Preço do ${service} alterado para: ${newPrice}`);
+        });
+    });
+}
+
+function initTimeSlots() {
+    const timeSlots = document.querySelectorAll('.time-slot');
+    
+    timeSlots.forEach(slot => {
+        slot.addEventListener('click', function() {
+            timeSlots.forEach(s => s.classList.remove('selected'));
+            this.classList.add('selected');
+            document.getElementById('selected-time').value = this.getAttribute('data-time-value');
+            validateForm();
+        });
+    });
+}
+
+function initPetSearch() {
+    const searchInput = document.getElementById('pet-search');
+    const resultsDiv = document.getElementById('pet-results');
+    
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        
+        if (query.length < 2) {
+            resultsDiv.style.display = 'none';
+            return;
+        }
+        
+        const filteredPets = allPets.filter(pet => 
+            pet.nome.toLowerCase().includes(query)
+        );
+        
+        if (filteredPets.length > 0) {
+            resultsDiv.innerHTML = filteredPets.map(pet => 
+                `<div class="pet-result" onclick="selectPet(${pet.id}, '${pet.nome}', '${pet.tutorName}')" style="padding: 8px; cursor: pointer; border-bottom: 1px solid #eee;">
+                    <strong>${pet.nome}</strong> <span style="color: #666; font-weight: normal;">- ${pet.tutorName}</span>
+                </div>`
+            ).join('');
+            resultsDiv.style.display = 'block';
+        } else {
+            resultsDiv.style.display = 'none';
+        }
+    });
+}
+
+function selectPet(petId, petName, tutorName) {
+    document.getElementById('selected-pet-id').value = petId;
+    document.getElementById('pet-search').value = '';
+    document.getElementById('pet-results').style.display = 'none';
+    
+    const displayDiv = document.getElementById('selected-pet-display');
+    displayDiv.innerHTML = `<strong>${petName}</strong> <span style="color: #666;">- ${tutorName}</span>`;
+    displayDiv.style.display = 'block';
+    
+    validateForm();
+}
+
+function validateForm() {
+    const petId = document.getElementById('selected-pet-id').value;
+    const serviceName = document.getElementById('service-name').value;
+    const selectedDate = document.getElementById('selected-date').value;
+    const selectedTime = document.getElementById('selected-time').value;
+    const startDate = document.getElementById('start-date').value;
+    
+    const isRangeService = serviceName === 'Pet Sitting' || serviceName === 'Hosting';
+    const isValid = petId && serviceName && 
+        (isRangeService ? startDate : (selectedDate && selectedTime));
+    
+    document.getElementById('save-appointment').disabled = !isValid;
+}
+
+function showAppointmentForm() {
+    document.getElementById('appointment-form').style.display = 'block';
+}
+
+function hideAppointmentForm() {
+    document.getElementById('appointment-form').style.display = 'none';
+    // Reset form
+    document.getElementById('admin-appointment-form').reset();
+    document.querySelectorAll('.service-option').forEach(opt => opt.classList.remove('selected'));
+    document.getElementById('selected-pet-display').style.display = 'none';
+}
+
+function generateReport(type) {
+    const url = type === 'pdf' ? '/admin/reports/pdf' : '/admin/reports/excel';
+    window.open(url, '_blank');
+}
+</script>
+
+<style>
+.editable {
+    cursor: pointer;
+    border: 1px dashed transparent;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.editable:hover {
+    border-color: #ddd;
+    background: #f8f9fa;
+}
+
+.pet-result:hover {
+    background: #f8f9fa;
+}
+
+.service-option.selected {
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(254, 135, 160, 0.2);
+}
+
+.time-slot.selected {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+}
+</style>
+
+<script src="/js/script.js"></script>
 </body>
 </html>

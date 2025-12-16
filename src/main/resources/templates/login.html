@@ -32,7 +32,7 @@
             <button class="tab-btn" id="tab-registro">Criar Conta</button>
         </div>
 
-        <form th:action="@{/perform_login}" method="POST" class="form-auth" id="login-form">
+        <form th:action="@{/perform_login}" method="POST" class="auth-form" id="login-form">
 
             <div th:if="${param.error}" class="alert-error" style="color: darkred; margin-bottom: 15px; padding: 10px; border: 1px solid darkred; border-radius: 4px;">
                 Email ou senha inválidos.
@@ -92,6 +92,56 @@
 
     </div>
 </div>
-<script src="/js/auth.js"></script>
+<script>
+// JavaScript específico para login/registro
+document.addEventListener('DOMContentLoaded', function() {
+    const tabEntrar = document.getElementById('tab-entrar');
+    const tabRegistro = document.getElementById('tab-registro');
+    const loginForm = document.getElementById('login-form');
+    const registroForm = document.getElementById('registro-form');
+    
+    // Função para alternar abas
+    function switchTab(activeTab, inactiveTab, showForm, hideForm) {
+        activeTab.classList.add('active');
+        inactiveTab.classList.remove('active');
+        showForm.classList.remove('hidden');
+        hideForm.classList.add('hidden');
+    }
+    
+    // Event listeners para as abas
+    tabEntrar.addEventListener('click', function() {
+        switchTab(tabEntrar, tabRegistro, loginForm, registroForm);
+    });
+    
+    tabRegistro.addEventListener('click', function() {
+        switchTab(tabRegistro, tabEntrar, registroForm, loginForm);
+    });
+    
+    // Validação de confirmação de senha apenas no registro
+    const regSenha = document.getElementById('reg-senha');
+    const regConfirmaSenha = document.getElementById('reg-confirma-senha');
+    const submitBtn = registroForm.querySelector('button[type="submit"]');
+    
+    function validatePasswords() {
+        if (regSenha.value && regConfirmaSenha.value) {
+            if (regSenha.value === regConfirmaSenha.value) {
+                regConfirmaSenha.style.borderColor = '#28a745';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+            } else {
+                regConfirmaSenha.style.borderColor = '#dc3545';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+            }
+        }
+    }
+    
+    if (regSenha && regConfirmaSenha) {
+        regSenha.addEventListener('input', validatePasswords);
+        regConfirmaSenha.addEventListener('input', validatePasswords);
+    }
+});
+</script>
+<script src="/js/script.js"></script>
 </body>
 </html>

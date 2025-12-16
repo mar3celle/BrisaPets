@@ -50,7 +50,7 @@
                     <label for="petId" class="subsection-title">Para qual Pet é o serviço?</label>
                     <select id="petId" name="petId" class="form-control" required>
                         <option value="">Selecione um Pet</option>
-                        <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.nome}"></option>
+                        <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.nome}" th:attr="data-weight=${pet.weightKg}"></option>
                     </select>
                     <p th:if="${pets.isEmpty()}" class="text-danger mt-2">⚠️ Você precisa cadastrar um Pet para agendar um serviço! Vá para <a th:href="@{/pets}">Meus Pets</a>.</p>
                 </div>
@@ -62,7 +62,7 @@
                         <p>Banho relaxante com produtos premium, secagem e escovagem profissional</p>
                         <div class="service-meta">
                             <span><i class="fas fa-clock"></i> 45-60 min</span>
-                            <span class="price-tag">25€</span>
+                            <span class="price-tag" id="price-banho">15€</span>
                         </div>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                         <p>Banho completo + tosquia higiénica com cuidado especial</p>
                         <div class="service-meta">
                             <span><i class="fas fa-clock"></i> 60-90 min</span>
-                            <span class="price-tag bold-value">35€</span>
+                            <span class="price-tag bold-value" id="price-banho-tosquia-intima">20€</span>
                         </div>
                     </div>
                 </div>
@@ -87,7 +87,7 @@
                         <p>Pacote completo com banho e tosquia geral adaptada à raça</p>
                         <div class="service-meta">
                             <span><i class="fas fa-clock"></i> 90-120 min</span>
-                            <span class="price-tag bold-value">50€</span>
+                            <span class="price-tag bold-value" id="price-banho-tosquia-geral">25€</span>
                         </div>
                     </div>
                 </div>
@@ -146,15 +146,11 @@
 
                         <th:block th:each="day : ${calendarDays}">
                             <span th:if="${day == null}"></span>
-
-                            <th:block th:if="${day != null}">
-
-                                <span
-                                        th:class="${currentYearMonth.atDay(day).isBefore(currentDate) ? 'day-number inactive' : 'day-number'}"
-                                        th:attr="data-date-value=${currentYearMonth.atDay(day)}"
-                                        th:text="${day}">
-                                </span>
-                            </th:block>
+                            <span th:if="${day != null}"
+                                  th:class="${currentYearMonth.atDay(day).isBefore(currentDate) ? 'day-number inactive' : 'day-number'}"
+                                  th:attr="data-date-value=${currentYearMonth.atDay(day)}"
+                                  th:text="${day}">
+                            </span>
                         </th:block>
                     </div>
 
@@ -166,36 +162,15 @@
                         <button type="button" class="time-slot active-time" data-time-value="14:00">14:00</button>
                         <button type="button" class="time-slot active-time" data-time-value="15:00">15:00</button>
                         <button type="button" class="time-slot active-time" data-time-value="16:00">16:00</button>
-                        <button type="button" class="time-slot active-time" data-time-value="17:00">17:00</button>
                     </div>
-
-                    <!-- Date range fields for Pet Sitting and Hosting -->
-                    <div class="date-range-container" id="dateRangeContainer" style="display: none;">
-                        <div class="date-range-inputs">
-                            <div class="date-input-group">
-                                <label for="startDate">Data de Início:</label>
-                                <input type="date" id="startDate" name="startDate" class="form-control" />
-                            </div>
-                            <div class="date-input-group">
-                                <label for="endDate">Data de Fim:</label>
-                                <input type="date" id="endDate" name="endDate" class="form-control" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Observations field for Pet Sitting and Hosting -->
-                    <div class="observations-container" id="observationsContainer" style="display: none;">
-                        <label for="observations">Observações (opcional):</label>
-                        <textarea id="observations" name="observations" class="form-control" rows="3" placeholder="Informações adicionais sobre o seu pet ou preferências especiais..."></textarea>
-                    </div>
-
+                    
+                    <!-- Campos ocultos para o formulário -->
                     <input type="hidden" id="serviceName" name="serviceName" value="" />
                     <input type="hidden" id="selectedDate" name="selectedDate" value="" />
                     <input type="hidden" id="selectedTime" name="selectedTime" value="" />
-
-
-                    <button type="submit" class="btn btn-confirm-appointment" id="confirmAppointmentBtn" disabled>
-                        <i class="fas fa-calendar-check"></i> <span id="confirmButtonText">Confirmar Agendamento</span>
+                    
+                    <button type="submit" class="btn btn-primary" id="confirmAppointmentBtn" disabled style="margin-top: 20px; padding: 15px 30px; width: 100%;">
+                        <i class="fas fa-calendar-check"></i> Confirmar Agendamento
                     </button>
                 </div>
             </div>
@@ -203,7 +178,54 @@
     </form>
 </section>
 
-<script src="js/booking.js">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const petSelect = document.getElementById('petId');
+        
+        function calculatePrice(serviceName, weight) {
+            if (!weight || weight <= 0) {
+                switch(serviceName) {
+                    case 'Banho': return 15;
+                    case 'Banho e Tosquia Intima': return 20;
+                    case 'Banho e Tosquia Geral': return 25;
+                    default: return 0;
+                }
+            }
+            
+            switch(serviceName) {
+                case 'Banho':
+                    if (weight <= 5) return 10;
+                    if (weight <= 10) return 15;
+                    return 20;
+                case 'Banho e Tosquia Intima':
+                    if (weight <= 5) return 15;
+                    if (weight <= 10) return 20;
+                    return 25;
+                case 'Banho e Tosquia Geral':
+                    if (weight <= 5) return 20;
+                    if (weight <= 10) return 25;
+                    return 30;
+                default:
+                    return 0;
+            }
+        }
+        
+        function updatePrices() {
+            const selectedOption = petSelect.options[petSelect.selectedIndex];
+            const weight = selectedOption ? parseFloat(selectedOption.getAttribute('data-weight')) : null;
+            
+            document.getElementById('price-banho').textContent = calculatePrice('Banho', weight) + '€';
+            document.getElementById('price-banho-tosquia-intima').textContent = calculatePrice('Banho e Tosquia Intima', weight) + '€';
+            document.getElementById('price-banho-tosquia-geral').textContent = calculatePrice('Banho e Tosquia Geral', weight) + '€';
+        }
+        
+        if (petSelect) {
+            petSelect.addEventListener('change', updatePrices);
+        }
+    });
 </script>
+<script src="/js/script.js"></script>
+<script src="/js/booking.js"></script>
+
 </body>
 </html>

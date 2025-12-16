@@ -37,3 +37,9 @@ application-local.properties
 ### Build artifacts ###
 target/
 *.class
+
+### Uploads ###
+uploads/
+
+### Database ###
+data/

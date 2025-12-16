@@ -4,6 +4,7 @@ import com.brisapets.webapp.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,6 +14,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final UserService userService;
@@ -50,11 +52,8 @@ public class SecurityConfig {
                         // 2. Rotas de Autenticação e Index
                         .requestMatchers("/", "/entrar", "/login", "/register", "/autenticar", "/perform_login", "/oauth2/**", "/login/oauth2/**").permitAll()
 
-                        // Debug endpoint (temporary)
-                        .requestMatchers("/debug/**").authenticated()
-
-                        // ROTA DO PAINEL ADMIN: Requer a ROLE_ADMIN (mais idiomático)
-                        .requestMatchers("/admin", "/clientlist").hasRole("ADMIN")
+                        // Admin routes - now handled by @PreAuthorize annotations
+                        .requestMatchers("/admin/**", "/adminCalendar/**", "/clientlist", "/reports/**").hasRole("ADMIN")
 
                         // O resto das rotas são privadas (ex: /perfil, /pets, /appointments)
                         .anyRequest().authenticated()
@@ -87,7 +86,7 @@ public class SecurityConfig {
                 )
                 // Disable CSRF for API endpoints
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/admin/appointments/**")
+                        .ignoringRequestMatchers("/admin/appointments/**", "/reports/**", "/api/**")
                 );
 
 

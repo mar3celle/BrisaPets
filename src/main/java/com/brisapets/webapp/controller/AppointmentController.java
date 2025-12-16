@@ -31,7 +31,7 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
     private final UserService userService;
     private final PricingService pricingService;
-    private final CalendarService calendarService; // NOVO: Injeção do CalendarService
+    private final CalendarService calendarService; //  Injeção do CalendarService
 
     // Construtor com injeção de dependências
     @Autowired
@@ -40,13 +40,13 @@ public class AppointmentController {
             AppointmentService appointmentService,
             UserService userService,
             PricingService pricingService,
-            CalendarService calendarService // NOVO: Adicionado
+            CalendarService calendarService
     ) {
         this.petService = petService;
         this.appointmentService = appointmentService;
         this.userService = userService;
         this.pricingService = pricingService;
-        this.calendarService = calendarService; // NOVO: Atribuição
+        this.calendarService = calendarService;
     }
 
     /**
@@ -57,8 +57,7 @@ public class AppointmentController {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             return userService.findByEmail(userEmail).getId();
         } catch (UsernameNotFoundException e) {
-            // Em um sistema real, isto deve ser tratado com uma exceção de segurança
-            // Ou um redirecionamento para login.
+
             throw new RuntimeException("Utilizador não autenticado ou não encontrado.", e);
         }
     }
@@ -86,24 +85,35 @@ public class AppointmentController {
     @GetMapping("/agendar")
     public String showAppointmentForm(Model model,
                                       @RequestParam(value = "yearMonth", required = false) String yearMonthStr) {
-
         Long currentUserId = getLoggedInUserId();
 
         // 1. Carregar lista de Pets do utilizador logado
         List<Pet> userPets = petService.findPetsByTutor(currentUserId);
+        model.addAttribute("pets", userPets);
 
-        // Se o utilizador não tem pets, não pode agendar
-        if (userPets.isEmpty()) {
-            model.addAttribute("error", "Não pode agendar sem registar um Pet primeiro.");
-            return "booking"; // Retorna para a página de agendamento, mas com erro
+        // 2. Se o utilizador não tem pets, mostra aviso e não tenta montar o formulário completo
+        if (userPets == null || userPets.isEmpty()) {
+            model.addAttribute("noPets", true);
+            YearMonth currentYearMonth = (yearMonthStr != null && !yearMonthStr.isEmpty())
+                    ? YearMonth.parse(yearMonthStr)
+                    : YearMonth.now();
+
+            model.addAttribute("currentYearMonth", currentYearMonth);
+            model.addAttribute("calendarDays", calendarService.calculateCalendarDays(currentYearMonth));
+            model.addAttribute("currentDate", LocalDate.now());
+            model.addAttribute("monthName", currentYearMonth.getMonth()
+                    .getDisplayName(java.time.format.TextStyle.FULL, new java.util.Locale("pt", "PT")));
+            model.addAttribute("yearValue", currentYearMonth.getYear());
+            model.addAttribute("prevMonthYear", currentYearMonth.minusMonths(1).getYear());
+            model.addAttribute("prevMonth", currentYearMonth.minusMonths(1).getMonthValue());
+            model.addAttribute("nextMonthYear", currentYearMonth.plusMonths(1).getYear());
+            model.addAttribute("nextMonth", currentYearMonth.plusMonths(1).getMonthValue());
+
+            return "booking";
         }
 
-        // 2. Adicionar o Pet e um novo Appointment (vazio) ao Model
-        model.addAttribute("pets", userPets);
-        // O objeto 'appointmentForm' é crucial para o Thymeleaf preencher
         model.addAttribute("appointmentForm", new Appointment());
 
-        // 3. Lógica do Calendário
         YearMonth currentYearMonth;
         if (yearMonthStr != null && !yearMonthStr.isEmpty()) {
             try {
@@ -115,24 +125,19 @@ public class AppointmentController {
             currentYearMonth = YearMonth.now();
         }
 
-        // Adiciona informações para construir o calendário (dias, mês/ano atual, links)
         model.addAttribute("currentYearMonth", currentYearMonth);
         model.addAttribute("calendarDays", calendarService.calculateCalendarDays(currentYearMonth));
         model.addAttribute("currentDate", LocalDate.now());
-        model.addAttribute("monthName", currentYearMonth.getMonth().getDisplayName(java.time.format.TextStyle.FULL, new java.util.Locale("pt", "PT")));
+        model.addAttribute("monthName", currentYearMonth.getMonth()
+                .getDisplayName(java.time.format.TextStyle.FULL, new java.util.Locale("pt", "PT")));
         model.addAttribute("yearValue", currentYearMonth.getYear());
-
-        // Links de navegação do calendário
         model.addAttribute("prevMonthYear", currentYearMonth.minusMonths(1).getYear());
         model.addAttribute("prevMonth", currentYearMonth.minusMonths(1).getMonthValue());
         model.addAttribute("nextMonthYear", currentYearMonth.plusMonths(1).getYear());
         model.addAttribute("nextMonth", currentYearMonth.plusMonths(1).getMonthValue());
 
-        // 4. Placeholder para Horários Disponíveis
         List<String> availableTimes = List.of("09:00", "10:00", "11:00", "14:00", "15:00", "16:00");
         model.addAttribute("availableTimes", availableTimes);
-
-        // 5. Placeholder para Serviços e Preços
 
         Map<String, BigDecimal> servicesAndPrices = new HashMap<>();
         servicesAndPrices.put("Banho", pricingService.getServicePrice("Banho"));
@@ -142,10 +147,8 @@ public class AppointmentController {
         servicesAndPrices.put("Hosting", pricingService.getServicePrice("Hosting"));
         model.addAttribute("services", servicesAndPrices);
 
-
-        return "booking"; // Assume que o template é booking.html (o nome do ficheiro javascript é booking.js)
+        return "booking";
     }
-
 
     // 3. Método POST para salvar o agendamento
     @PostMapping("/agendar/save")
@@ -219,8 +222,12 @@ public class AppointmentController {
 
             appointment.setPet(pet);
 
-            // 4. Definir o preço do serviço
-            appointment.setValue(pricingService.getServicePrice(appointment.getServiceName()));
+            // 4. Definir o preço do serviço usando o peso do pet
+            BigDecimal value = pricingService.getServicePrice(
+                    appointment.getServiceName(),
+                    pet.getWeightKg()
+            );
+            appointment.setValue(value);
             appointment.setIsPaid(false); // Por defeito não pago
 
             // 5. Validar se a data é futura

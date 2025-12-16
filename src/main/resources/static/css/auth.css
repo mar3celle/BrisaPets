@@ -262,4 +262,11 @@ textarea:-webkit-autofill {
     }
 
     .tab-navigation {
-        flex-direction:
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .tab-btn {
+        width: 100%;
+    }
+}

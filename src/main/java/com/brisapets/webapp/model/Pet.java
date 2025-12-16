@@ -22,6 +22,7 @@ public class Pet extends BaseEntity {
     private Integer idade;
     private Boolean castrado;
     private String imageUrl;
+    private Double weightKg;
     private Long tutorId;
 
     // Inicializa a lista para evitar NPE (NullPointerException)

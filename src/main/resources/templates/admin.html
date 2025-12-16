@@ -101,10 +101,10 @@
                 </thead>
                 <tbody>
                     <tr th:each="user : ${allUsers}">
-                        <td th:text="${user.firstName + ' ' + user.lastName}">Nome</td>
+                        <td th:text="${user.firstName} + ' ' + ${user.lastName}">Nome</td>
                         <td th:text="${user.email}">email@example.com</td>
                         <td>
-                            <span th:each="role : ${user.roles}" th:text="${role.name}" class="badge badge-new"></span>
+                            <span th:each="role : ${user.roles}" th:text="${role.name}" class="badge"></span>
                         </td>
                         <td>
                             <form th:action="@{/admin/user/delete/{id}(id=${user.id})}" method="post" style="display: inline;">
@@ -118,5 +118,44 @@
             </table>
         </div>
     </div>
+
+<style>
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 4px;
+    background: #e9ecef;
+    color: #495057;
+    margin-right: 4px;
+}
+
+.btn-confirm {
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+</style>
+
+<script src="/js/script.js"></script>
 </body>
 </html>

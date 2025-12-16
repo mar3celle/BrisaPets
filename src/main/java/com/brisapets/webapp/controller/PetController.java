@@ -11,10 +11,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Controller
 public class PetController {
@@ -58,14 +64,36 @@ public class PetController {
 
     // 2. Mapeamento para receber e salvar um novo Pet
     @PostMapping("/pets/save")
-    public String savePet(@ModelAttribute("pet") Pet pet, RedirectAttributes redirectAttributes) {
+    public String savePet(@ModelAttribute("pet") Pet pet,
+                          @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                          RedirectAttributes redirectAttributes) {
 
-        // --- Lógica de Segurança Corrigida ---
-        pet.setTutorId(getLoggedInUserId()); // <-- USA O ID REAL
+        pet.setTutorId(getLoggedInUserId());
 
-        petService.savePet(pet);
+        try {
+            if (imageFile != null && !imageFile.isEmpty()) {
+                Path uploadDir = Paths.get("uploads/pets");
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
 
-        redirectAttributes.addFlashAttribute("message", "Pet salvo com sucesso!");
+                String extension = Optional.ofNullable(imageFile.getOriginalFilename())
+                        .filter(name -> name.contains("."))
+                        .map(name -> name.substring(name.lastIndexOf(".")))
+                        .orElse("");
+                String filename = UUID.randomUUID() + extension;
+
+                Path targetPath = uploadDir.resolve(filename);
+                Files.copy(imageFile.getInputStream(), targetPath);
+
+                pet.setImageUrl("/uploads/pets/" + filename);
+            }
+
+            petService.savePet(pet);
+            redirectAttributes.addFlashAttribute("message", "Pet salvo com sucesso!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erro ao salvar o Pet.");
+        }
 
         return "redirect:/pets";
     }
