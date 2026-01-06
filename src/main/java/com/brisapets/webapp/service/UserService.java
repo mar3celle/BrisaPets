@@ -4,39 +4,125 @@ import com.brisapets.webapp.dto.UserRegistrationDto;
 import com.brisapets.webapp.dto.UserProfileUpdateDto;
 import com.brisapets.webapp.dto.UserPasswordUpdateDto;
 import com.brisapets.webapp.dto.UserAddressUpdateDto;
+import com.brisapets.webapp.model.Role;
 import com.brisapets.webapp.model.User;
+import com.brisapets.webapp.repository.RoleRepository;
+import com.brisapets.webapp.repository.UserRepository;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-import java.util.List; // NOVO: Import para findAllUsers
-import java.util.Optional; // NOVO: Import para findUserById
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-public interface UserService extends UserDetailsService {
-    // Para registo de novos utilizadores
-    User save(UserRegistrationDto registrationDto);
+@Service
+public final class UserService implements UserDetailsService {
 
-    // Para obter o utilizador pelo email (username)
-    User findByEmail(String email);
+    private static final String ADMIN_EMAIL = "marcellesart@gmail.com";
 
-    // Implementação do Spring Security UserDetailsService
-    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    // -----------------------------------------------------------------------
-    // MÉTODOS DE ADMIN/GESTÃO
-    // -----------------------------------------------------------------------
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    // Método para deletar um utilizador pelo ID
-    void deleteUserById(Long id);
+    public User save(UserRegistrationDto registrationDto) {
+        var user = new User();
+        user.setFirstName(registrationDto.getFirstName());
+        user.setLastName(registrationDto.getLastName());
+        user.setEmail(registrationDto.getEmail());
+        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
+        user.setDeleted(false);
 
-    //Método para listar todos os utilizadores (útil para Admin)
-    List<User> findAllUsers();
+        var roleCliente = roleRepository.findByName("ROLE_CLIENTE")
+                .orElseGet(() -> roleRepository.save(new Role("ROLE_CLIENTE")));
 
-    // Método para buscar um utilizador pelo ID
-    Optional<User> findUserById(Long id);
+        var roles = new java.util.ArrayList<>(Collections.singletonList(roleCliente));
 
-    // Profile update methods
-    void updateProfile(Long userId, UserProfileUpdateDto profileDto);
-    void updatePassword(Long userId, UserPasswordUpdateDto passwordDto);
-    void updateAddress(Long userId, UserAddressUpdateDto addressDto);
+        if (ADMIN_EMAIL.equalsIgnoreCase(registrationDto.getEmail())) {
+            var roleAdmin = roleRepository.findByName("ROLE_ADMIN")
+                    .orElseGet(() -> roleRepository.save(new Role("ROLE_ADMIN")));
+            roles.add(roleAdmin);
+        }
+
+        user.setRoles(roles);
+        return userRepository.save(user);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilizador não encontrado com o email: " + email));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        var user = findByEmail(username);
+        var authorities = mapRolesToAuthorities(user.getRoles());
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                authorities);
+    }
+
+    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .toList();
+    }
+
+    public List<User> findAllUsers() {
+        return userRepository.findAllActive();
+    }
+
+    public Optional<User> findUserById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    public void deleteUserById(Long id) {
+        var user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        user.softDelete();
+        userRepository.save(user);
+    }
+
+    public void updateProfile(Long userId, UserProfileUpdateDto profileDto) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setFirstName(profileDto.getFirstName());
+        user.setLastName(profileDto.getLastName());
+        user.setPhone(profileDto.getPhone());
+        userRepository.save(user);
+    }
+
+    public void updatePassword(Long userId, UserPasswordUpdateDto passwordDto) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (!passwordEncoder.matches(passwordDto.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Senha atual incorreta");
+        }
+        
+        user.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    public void updateAddress(Long userId, UserAddressUpdateDto addressDto) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setAddress(addressDto.getAddress());
+        user.setCity(addressDto.getCity());
+        user.setZipCode(addressDto.getZipCode());
+        userRepository.save(user);
+    }
 }

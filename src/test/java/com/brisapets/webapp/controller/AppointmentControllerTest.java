@@ -12,6 +12,9 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.math.BigDecimal;
+import java.time.YearMonth;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -23,7 +26,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 // Apenas carrega o AppointmentController e o contexto MVC
 @WebMvcTest(controllers = AppointmentController.class, excludeAutoConfiguration = {
-    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class
+    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+    org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientWebSecurityAutoConfiguration.class
 })
 public class AppointmentControllerTest {
 
@@ -39,6 +43,12 @@ public class AppointmentControllerTest {
     
     @MockBean
     private com.brisapets.webapp.service.UserService userService;
+    
+    @MockBean
+    private com.brisapets.webapp.service.PricingService pricingService;
+    
+    @MockBean
+    private com.brisapets.webapp.service.CalendarService calendarService;
 
     @Test
     @WithMockUser(username = "test@example.com", roles = "USER")
@@ -52,6 +62,8 @@ public class AppointmentControllerTest {
         mockUser.setId(tutorId);
         when(userService.findByEmail("test@example.com")).thenReturn(mockUser);
         when(petService.findPetsByTutor(tutorId)).thenReturn(Arrays.asList(pet1));
+        when(pricingService.getServicePrice(any(String.class))).thenReturn(new BigDecimal("25.00"));
+        when(calendarService.calculateCalendarDays(any(YearMonth.class))).thenReturn(List.of());
 
         // ACT & ASSERT: Verifica se o GET para /agendar retorna a view correta
         mockMvc.perform(get("/agendar"))
@@ -82,11 +94,13 @@ public class AppointmentControllerTest {
 
         // 3. Moca o AppointmentService para simular o salvamento
         when(appointmentService.saveAppointment(any())).thenAnswer(i -> i.getArguments()[0]);
+        when(appointmentService.isSlotAvailable(any())).thenReturn(true);
+        when(pricingService.getServicePrice(any(String.class), any(Double.class))).thenReturn(new BigDecimal("25.00"));
 
         // ACT & ASSERT: Simula o POST do formulário
         mockMvc.perform(post("/agendar/save")
                         .param("serviceName", "Banho e Tosquia Intima")
-                        .param("selectedDate", "2025-11-25")
+                        .param("selectedDate", "2026-12-25")
                         .param("selectedTime", "15:30")
                         .param("petId", "10"))
                 .andExpect(status().is3xxRedirection()) // Espera um redirecionamento (status 302/303)
