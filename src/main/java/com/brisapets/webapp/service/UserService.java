@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public final class UserService implements UserDetailsService {
+public class UserService implements UserDetailsService {
 
     private static final String ADMIN_EMAIL = "marcellesart@gmail.com";
 
